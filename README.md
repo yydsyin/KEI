@@ -178,22 +178,42 @@ pas besoin d'exister vraiment.
 Tout le monde entre par **`connexion.html`**. Les trois autres pages y
 renvoient automatiquement si personne n'est connecté.
 
-On y choisit d'abord **où l'on veut aller** :
+On y indique d'abord **quel compte on utilise** :
 
-| Porte | Mène à | Qui peut |
+| Porte | Comptes concernés | Mène à |
 |---|---|---|
-| **Commander** | `index.html` | tous les comptes |
-| **Espace interne** | `cuisine.html` ou `admin.html` selon le rôle | chef et admin |
+| **Commander** | les comptes sans rôle | `index.html` |
+| **Espace interne** | `chef` et `admin` | `cuisine.html` ou `admin.html` selon le rôle |
 
-### Le choix ne dit pas quel type de compte on a
+### Un compte = un rôle = une seule page
 
-C'est le point important. **Un compte n'est pas « client » ou « interne »** :
-c'est le même compte partout. La porte indique seulement la destination.
+**Les comptes sont séparés selon leur type.** Le rôle décide de la seule
+page où le compte a le droit d'aller, et une seule fonction tranche pour
+tout le site : `pageDuRole()`, dans `js/kei-firebase.js`.
 
-- Le chef peut passer par **Commander** et commander comme n'importe qui.
-- Un client qui choisit **Espace interne** est bien connecté, mais reçoit
-  *« Ce compte n'a pas d'accès à l'espace interne »* — et on lui propose
-  d'aller commander plutôt que de le déconnecter.
+| Rôle | Sa page | Ce qu'il ne peut pas faire |
+|---|---|---|
+| *(aucun)* | `index.html` | entrer dans l'espace interne |
+| `chef` | `cuisine.html` | commander |
+| `admin` | `admin.html` | commander, ni voir la cuisine |
+
+Le chef ne commande donc pas avec son compte de chef : s'il veut manger,
+il lui faut un compte client, comme tout le monde.
+
+Se tromper de porte ne déconnecte pas. Le site explique — *« Ce compte est
+un compte interne : il ne sert pas à commander »* — et affiche le bouton
+qui mène à la bonne page.
+
+La séparation est vérifiée **à deux endroits**, pour qu'aucune adresse
+tapée à la main ne la contourne :
+
+1. à la connexion, dans `js/connexion.js` ;
+2. à l'ouverture de chaque page — `js/comptes.js` pour la commande,
+   `js/cuisine.js` pour la cuisine, `js/admin.js` pour la carte.
+
+Et ce qui compte vraiment, les commandes, reste protégé **côté serveur**
+par les règles Firebase : un client ne peut lire que les siennes, quoi
+qu'il tape dans la barre d'adresse.
 
 ### Une seule session pour tout le site
 

@@ -27,7 +27,7 @@
       "$commande": {
         ".read": "auth != null && (data.child('uid').val() === auth.uid || root.child('roles').child(auth.uid).val() === 'chef')",
 
-        ".write": "auth != null && ((!data.exists() && newData.child('uid').val() === auth.uid) || root.child('roles').child(auth.uid).val() === 'chef')",
+        ".write": "auth != null && ((!data.exists() && newData.child('uid').val() === auth.uid && !root.child('roles').child(auth.uid).exists()) || (data.exists() && root.child('roles').child(auth.uid).val() === 'chef'))",
 
         ".validate": "newData.hasChildren(['numero','date','statut','uid'])",
 

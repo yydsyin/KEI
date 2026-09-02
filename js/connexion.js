@@ -4,26 +4,33 @@
    Une seule porte d'entree pour tout le site. On y choisit
    d'abord OU l'on veut aller, puis on se connecte.
 
-   IMPORTANT : le choix ne dit pas quel TYPE de compte on a.
-   Un compte n'est pas "client" ou "interne" : c'est le meme
-   compte partout. Le choix indique seulement la destination.
+   IMPORTANT : les comptes sont separes selon leur type. Un compte
+   appartient a une seule porte, et le role decide laquelle :
 
-   - "Commander"      -> index.html, ouvert a tous les comptes
-   - "Espace interne" -> cuisine.html si le role est "chef",
-                         admin.html   si le role est "admin"
+   - pas de role -> compte client -> "Commander"      -> index.html
+   - role "chef" -> compte interne -> "Espace interne" -> cuisine.html
+   - role "admin"-> compte interne -> "Espace interne" -> admin.html
 
-   Un compte sans role peut donc commander, mais pas entrer dans
-   l'espace interne. Et le chef, s'il le veut, peut tres bien
-   commander comme n'importe qui.
+   Le chef ne peut donc pas commander avec son compte de chef, et
+   un client ne peut pas entrer dans l'espace interne. Si l'on se
+   trompe de porte, on n'est pas deconnecte : on nous montre
+   simplement celle qui nous revient.
+
+   C'est pageDuRole(), dans kei-firebase.js, qui tranche.
    ============================================================ */
 
 let porteChoisie = "client";
 
-/* Ou mene un role, dans l'espace interne ? */
-function pageInterne(role){
-  if (role === "chef")  return "cuisine.html";
-  if (role === "admin") return "admin.html";
-  return null;
+/* La porte a laquelle un compte appartient, d'apres sa page. */
+function porteDeLaPage(page){
+  return page === "index.html" ? "client" : "interne";
+}
+
+/* Le nom du bouton qui mene a cette page. */
+function titreDeLaPage(page){
+  if (page === "cuisine.html") return "Ecran cuisine";
+  if (page === "admin.html")   return "Gerer le menu";
+  return "Commander";
 }
 
 function erreur(texte){
@@ -44,25 +51,23 @@ function choisirPorte(nom){
    Apres une connexion reussie : ou envoie-t-on la personne ?
    ------------------------------------------------------------ */
 async function allerAuBonEndroit(){
-  if (porteChoisie === "client") {
-    location.href = "index.html";
-    return;
-  }
+  const page  = pageDuRole(await lireMonRole());
+  const porte = porteDeLaPage(page);
 
-  const role = await lireMonRole();
-  const page = pageInterne(role);
+  if (porte === porteChoisie) { location.href = page; return; }
 
-  if (page) { location.href = page; return; }
-
-  /* compte valide, mais sans role interne : on ne le deconnecte
-     pas, on lui propose simplement d'aller commander. */
-  erreur("Ce compte n'a pas d'acces a l'espace interne.");
+  /* Mauvaise porte. Le mot de passe etait bon : on ne deconnecte
+     pas, on explique et on montre la porte qui est la sienne. */
+  erreur(porteChoisie === "client"
+    ? "Ce compte est un compte interne : il ne sert pas a commander."
+    : "Ce compte est un compte client : il n'a pas d'acces a l'espace interne.");
   afficherDejaConnecte();
 }
 
 /* ------------------------------------------------------------
-   Quand quelqu'un est deja connecte, on lui montre les portes
-   qui lui sont ouvertes plutot que de redemander un mot de passe.
+   Quand quelqu'un est deja connecte, on lui montre sa porte
+   plutot que de redemander un mot de passe. Un compte n'en a
+   qu'une : il n'y a donc qu'un seul bouton.
    ------------------------------------------------------------ */
 async function afficherDejaConnecte(){
   const u = utilisateurActuel();
@@ -75,14 +80,8 @@ async function afficherDejaConnecte(){
   const zone = document.getElementById("portes-disponibles");
   zone.innerHTML = "";
 
-  /* commander : ouvert a tout le monde */
-  ajouterPorte(zone, "Commander", "index.html");
-
-  /* l'espace interne, selon le role */
-  const role = await lireMonRole();
-  const page = pageInterne(role);
-  if (page === "cuisine.html") ajouterPorte(zone, "Ecran cuisine", page);
-  if (page === "admin.html")   ajouterPorte(zone, "Gerer le menu", page);
+  const page = pageDuRole(await lireMonRole());
+  ajouterPorte(zone, titreDeLaPage(page), page);
 }
 
 function ajouterPorte(zone, titre, page){

@@ -131,6 +131,12 @@ document.addEventListener("DOMContentLoaded", function(){
   surConnexion(async function(utilisateur){
     if (!utilisateur) { location.href = "connexion.html"; return; }
 
+    /* Les comptes sont separes selon leur type : un compte chef ou
+       admin n'a rien a faire sur la page de commande. On ne le
+       deconnecte pas, on le renvoie sur sa propre page. */
+    const saPage = pageDuRole(await lireMonRole());
+    if (saPage !== "index.html") { location.href = saPage; return; }
+
     profilClient = await lireProfilEnLigne();
 
     document.getElementById("barre-compte").hidden = false;

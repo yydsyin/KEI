@@ -1,0 +1,11 @@
+# Le depot est PUBLIC : tout ce qui est liste ici ne part jamais sur GitHub.
+
+# Contient les UID Firebase des comptes : rien a faire en ligne.
+a-importer-dans-firebase.json
+
+# Reglages locaux de Claude Code, inutiles au site.
+.claude/
+
+# Fichiers que Windows fabrique tout seul.
+Thumbs.db
+desktop.ini

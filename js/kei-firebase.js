@@ -165,6 +165,21 @@ function lireMonRole(){
     .catch(function(){ return "client"; });
 }
 
+/* ------------------------------------------------------------
+   Un compte = un role = une seule page.
+
+   Les comptes sont separes selon leur type : un compte chef ne
+   sert qu'a la cuisine, un compte admin qu'a la carte, un compte
+   client qu'a commander. Cette fonction est le seul endroit qui
+   decide, et les quatre pages s'y referent : impossible qu'elles
+   se contredisent.
+   ------------------------------------------------------------ */
+function pageDuRole(role){
+  if (role === "chef")  return "cuisine.html";
+  if (role === "admin") return "admin.html";
+  return "index.html";          /* pas de role connu : compte client */
+}
+
 /* ============================================================
    LE PROFIL
    /profils/{uid} = { nom, telephone, adresse }
