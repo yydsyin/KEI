@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KEI &middot; Connexion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="page-connexion">
+
+  <main class="ecran-connexion">
+    <div class="carte-connexion">
+
+      <div class="logo-connexion" id="logo-connexion">KEI</div>
+      <p class="sous-connexion">Connectez-vous</p>
+
+      <!-- ---------- DEJA CONNECTE ---------- -->
+      <div id="deja-connecte" hidden>
+        <p class="bloc-deja">
+          Vous etes connectee en tant que <strong id="deja-identifiant"></strong>.
+        </p>
+        <div id="portes-disponibles"></div>
+        <button class="btn-secondaire" id="btn-changer-compte">Se connecter avec un autre compte</button>
+      </div>
+
+      <!-- ---------- FORMULAIRE ---------- -->
+      <div id="formulaire-connexion">
+
+        <p class="question-porte">Ou souhaitez-vous aller ?</p>
+
+        <div class="portes">
+          <button class="porte actif" id="porte-client" data-porte="client">
+            <svg class="porte-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3v7a2 2 0 0 0 4 0V3"/><path d="M8 10v11"/><path d="M17 3c-1.7 1.3-2.5 3.2-2.5 5.5S15.3 12.5 17 13v8"/></svg>
+            <span class="porte-titre">Commander</span>
+            <span class="porte-desc">Voir le menu et passer commande</span>
+          </button>
+
+          <button class="porte" id="porte-interne" data-porte="interne">
+            <svg class="porte-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="10" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+            <span class="porte-titre">Espace interne</span>
+            <span class="porte-desc">Cuisine et gestion du menu</span>
+          </button>
+        </div>
+
+        <label for="identifiant">Identifiant</label>
+        <div class="champ-suffixe">
+          <input type="text" id="identifiant" autocomplete="username" placeholder="Ex : yin">
+          <span id="suffixe-connexion">@kei.mg</span>
+        </div>
+
+        <label for="motdepasse">Mot de passe</label>
+        <input type="password" id="motdepasse" autocomplete="current-password">
+
+        <button class="btn-client" id="btn-connexion">Se connecter</button>
+
+        <p class="erreur-connexion" id="erreur-connexion"></p>
+
+        <p class="note-client" id="note-connexion">
+          Les comptes sont crees par le restaurant.
+          Contactez-le si vous souhaitez commander.
+        </p>
+
+      </div>
+
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+  <script src="js/config.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/kei-firebase.js"></script>
+  <script src="js/connexion.js"></script>
+</body>
+</html>

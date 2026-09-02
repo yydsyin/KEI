@@ -1,0 +1,57 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "roles": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "profils": {
+      "$uid": {
+        ".read":  "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+
+        "nom"      : { ".validate": "newData.isString() && newData.val().length <= 80" },
+        "telephone": { ".validate": "newData.isString() && newData.val().length <= 40" },
+        "adresse"  : { ".validate": "newData.isString() && newData.val().length <= 200" },
+        "$autre"   : { ".validate": false }
+      }
+    },
+
+    "commandes": {
+      ".read": "auth != null && root.child('roles').child(auth.uid).val() === 'chef'",
+
+      "$commande": {
+        ".read": "auth != null && (data.child('uid').val() === auth.uid || root.child('roles').child(auth.uid).val() === 'chef')",
+
+        ".write": "auth != null && ((!data.exists() && newData.child('uid').val() === auth.uid) || root.child('roles').child(auth.uid).val() === 'chef')",
+
+        ".validate": "newData.hasChildren(['numero','date','statut','uid'])",
+
+        "uid"      : { ".validate": "newData.isString() && newData.val().length <= 60" },
+        "numero"   : { ".validate": "newData.isString() && newData.val().length <= 40" },
+        "date"     : { ".validate": "newData.isString() && newData.val().length <= 40" },
+        "client"   : { ".validate": "newData.isString() && newData.val().length <= 80" },
+        "compte"   : { ".validate": "newData.isString() && newData.val().length <= 60" },
+        "telephone": { ".validate": "newData.isString() && newData.val().length <= 40" },
+        "mode"     : { ".validate": "newData.isString() && newData.val().length <= 30" },
+        "adresse"  : { ".validate": "newData.isString() && newData.val().length <= 200" },
+        "heure"    : { ".validate": "newData.isString() && newData.val().length <= 40" },
+        "remarque" : { ".validate": "newData.isString() && newData.val().length <= 300" },
+        "message"  : { ".validate": "newData.isString() && newData.val().length <= 4000" },
+        "total"    : { ".validate": "newData.isNumber() && newData.val() >= 0" },
+
+        "statut": {
+          ".validate": "newData.isString() && newData.val().matches(/^(nouvelle|vue)$/)"
+        },
+
+        "horodatage": { ".validate": "newData.isNumber()" },
+
+        "$autre": { ".validate": false }
+      }
+    }
+  }
+}

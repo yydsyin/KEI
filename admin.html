@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KEI &middot; Espace restaurant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Styles propres a la page d'administration */
+    body{ padding-bottom:40px; }
+    .boite{
+      max-width:420px; margin:70px auto; background:#fff;
+      border:1px solid var(--bordure); border-radius:var(--rayon);
+      padding:32px 28px; box-shadow:var(--ombre);
+    }
+    .boite h1{
+      font-family:var(--police-titre); font-weight:normal; font-size:26px;
+      margin-bottom:6px; text-align:center;
+    }
+    .boite p.sous{ text-align:center; color:var(--encre-doux); font-size:14px; margin-bottom:20px; }
+    .btn{
+      width:100%; margin-top:20px; background:var(--accent); color:#fff;
+      border:none; border-radius:10px; padding:14px; font-size:15px;
+      font-weight:600; cursor:pointer;
+    }
+    .btn:hover{ background:var(--accent-fonce); }
+    .btn.secondaire{ background:var(--encre); }
+    .btn.petit{ width:auto; padding:9px 16px; font-size:14px; margin-top:0; }
+    .erreur{ color:var(--accent); font-size:14px; text-align:center; margin-top:14px; min-height:20px; }
+
+    .admin-zone{ max-width:820px; margin:0 auto; padding:30px 18px; }
+    .barre-admin{
+      display:flex; justify-content:space-between; align-items:center;
+      flex-wrap:wrap; gap:12px; margin-bottom:26px;
+    }
+    .bloc-cat{
+      background:#fff; border:1px solid var(--bordure); border-radius:var(--rayon);
+      padding:18px; margin-bottom:18px;
+    }
+    .bloc-cat > .entete{ display:flex; gap:10px; align-items:center; margin-bottom:12px; }
+    .bloc-cat > .entete input{ font-size:17px; font-weight:600; }
+    .ligne-edit{
+      display:grid; grid-template-columns:1.1fr 1.6fr 90px 38px;
+      gap:8px; margin-bottom:8px; align-items:center;
+    }
+    .ligne-edit input{ padding:9px 10px; font-size:14px; }
+    .sup-btn{
+      background:none; border:1px solid var(--bordure); border-radius:8px;
+      color:var(--accent); cursor:pointer; padding:9px 0; font-size:15px;
+    }
+    .sup-btn:hover{ background:var(--accent); color:#fff; }
+    .entetes-colonnes{
+      display:grid; grid-template-columns:1.1fr 1.6fr 90px 38px; gap:8px;
+      font-size:12px; color:var(--encre-doux); margin-bottom:6px;
+    }
+    .info{
+      background:#fff8e6; border:1px solid #f0dfae; border-radius:10px;
+      padding:14px 16px; font-size:13.5px; color:#6b5a2a; margin-bottom:22px;
+    }
+
+    /* ---- les blocs d'outils (autorisation, administrateurs) ---- */
+    .bloc-outil{
+      background:#fff; border:1px solid var(--bordure);
+      border-radius:var(--rayon); padding:22px; margin-bottom:20px;
+    }
+    .bloc-outil h2{
+      font-family:var(--police-titre); font-weight:normal; font-size:21px;
+      color:var(--accent); margin-bottom:8px;
+    }
+    .explication-outil{ font-size:13.5px; color:var(--encre-doux); line-height:1.55; }
+    .explication-outil.centre{ text-align:center; }
+    .avert-outil{
+      font-size:12.5px; color:#6b5a2a; background:#fff8e6;
+      border:1px solid #f0dfae; border-radius:9px;
+      padding:10px 13px; margin-top:16px;
+    }
+    .form-outil{ display:flex; gap:8px; margin-top:14px; }
+    .form-outil.colonne{ flex-direction:column; }
+    .form-outil input{ flex:1; }
+    .form-outil button{ flex:0 0 auto; }
+    .form-outil.colonne button{ align-self:flex-start; }
+
+    .code-genere{
+      font-family:"Courier New",monospace;
+      font-size:38px; font-weight:bold; letter-spacing:8px;
+      text-align:center; color:var(--accent);
+      background:var(--papier); border:2px dashed var(--accent);
+      border-radius:12px; padding:18px 10px; margin:18px 0 10px;
+    }
+
+    .liste-admins{ list-style:none; margin-top:12px; }
+    .liste-admins li{
+      display:flex; justify-content:space-between; align-items:center;
+      gap:10px; padding:10px 0; border-bottom:1px dashed var(--bordure);
+      font-size:14.5px;
+    }
+    .liste-admins .role{ font-size:12.5px; color:var(--encre-doux); }
+    .sup-compte{
+      background:none; border:1px solid var(--bordure); border-radius:8px;
+      color:var(--accent); cursor:pointer;
+      width:30px; height:30px; font-size:13px; line-height:1;
+      flex:0 0 auto;
+    }
+    .sup-compte:hover{ background:var(--accent); color:#fff; border-color:var(--accent); }
+
+    .titre-section{
+      font-family:var(--police-titre); font-weight:normal; font-size:24px;
+      margin:34px 0 16px;
+    }
+
+    /* Les blocs d'explication se replient : la consigne ne doit pas
+       occuper l'ecran avant la tache. */
+    details.bloc-outil{ padding:0 22px; }
+    details.bloc-outil summary{
+      list-style:none; cursor:pointer;
+      padding:18px 0; margin:0;
+      display:flex; align-items:center; gap:9px;
+    }
+    details.bloc-outil summary::-webkit-details-marker{ display:none; }
+    details.bloc-outil summary::before{
+      content:""; flex:0 0 auto;
+      width:8px; height:8px;
+      border-right:1.5px solid var(--accent);
+      border-bottom:1.5px solid var(--accent);
+      transform:rotate(-45deg);
+      transition:transform var(--temps) var(--courbe);
+    }
+    details.bloc-outil[open] summary::before{ transform:rotate(45deg); }
+    details.bloc-outil summary h2{ margin:0; font-size:19px; }
+    details.bloc-outil > *:last-child{ padding-bottom:20px; }
+
+    @media (max-width:600px){
+      .ligne-edit, .entetes-colonnes{ grid-template-columns:1fr 1fr 70px 34px; }
+      .form-outil{ flex-direction:column; }
+      .code-genere{ font-size:30px; letter-spacing:5px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====== CHARGEMENT / ACCES REFUSE ====== -->
+  <div class="boite" id="ecran-attente">
+    <h1>Espace restaurant</h1>
+    <p class="sous" id="message-attente">Verification du compte&hellip;</p>
+    <p style="text-align:center;margin-top:16px"><a href="connexion.html">&larr; Page de connexion</a></p>
+  </div>
+
+  <!-- ====== ECRAN 2 : MODIFICATION DU MENU ====== -->
+  <div class="admin-zone" id="ecran-admin" hidden>
+
+    <div class="barre-admin">
+      <h1 style="font-family:var(--police-titre);font-weight:normal;font-size:28px">Espace restaurant</h1>
+      <div style="display:flex;align-items:center;gap:14px">
+        <span style="font-size:13.5px;color:var(--encre-doux)" id="admin-connecte"></span>
+        <button class="btn petit secondaire" id="btn-deconnexion">Se deconnecter</button>
+      </div>
+    </div>
+
+    <div class="info">
+      <strong>A savoir :</strong> les modifications sont enregistrees dans <em>ce navigateur</em>.
+      Pour qu'elles apparaissent pour tous les clients, cliquez sur
+      <strong>Telecharger menu.js</strong> puis remplacez le fichier <code>js/menu.js</code> sur GitHub.
+    </div>
+
+    <div id="zone-categories"></div>
+
+    <button class="btn petit secondaire" id="btn-ajout-categorie">+ Ajouter une categorie</button>
+
+    <hr style="margin:28px 0;border:none;border-top:1px solid var(--bordure)">
+
+    <button class="btn" id="btn-enregistrer">Enregistrer les modifications</button>
+    <button class="btn secondaire" id="btn-telecharger">Telecharger menu.js (pour GitHub)</button>
+    <button class="btn secondaire" id="btn-reinitialiser"
+            style="background:none;color:var(--encre-doux);border:1px solid var(--bordure)">
+      Revenir au menu d'origine
+    </button>
+
+    <h2 class="titre-section">Ajouter des comptes</h2>
+
+    <!-- ============ LES COMPTES CLIENTS ============ -->
+    <details class="bloc-outil">
+      <summary><h2>Comptes clients</h2></summary>
+      <p class="explication-outil">
+        Les comptes des clients sont geres par <strong>Firebase</strong>, pas
+        par cette page. Pour en creer un :
+      </p>
+      <ol class="explication-outil" style="margin:12px 0 0 20px">
+        <li>console.firebase.google.com &rarr; votre projet</li>
+        <li>Authentication &rarr; Users &rarr; <strong>Add user</strong></li>
+        <li>Email : <code>identifiant@kei.mg</code> (ex. <code>mialy@kei.mg</code>)</li>
+        <li>Mot de passe : au moins 6 caracteres</li>
+      </ol>
+      <p class="explication-outil" style="margin-top:12px">
+        Le client se connecte ensuite en tapant seulement
+        <code>mialy</code> : le site ajoute <code>@kei.mg</code> tout seul.
+        Il pourra changer son mot de passe et ses coordonnees lui-meme,
+        depuis <strong>Mes informations</strong>.
+      </p>
+      <p class="avert-outil">
+        Pour supprimer un client, c'est au meme endroit dans la console
+        Firebase. Un compte supprime ne peut plus se connecter, immediatement.
+      </p>
+    </details>
+
+    <!-- ============ LES ADMINISTRATEURS ============ -->
+    <details class="bloc-outil">
+      <summary><h2>Administrateurs</h2></summary>
+      <p class="explication-outil">
+        Les administrateurs sont des comptes <strong>Firebase</strong>, comme
+        les clients et le chef. Ce qui les distingue, c'est leur
+        <strong>role</strong>. Pour en ajouter un :
+      </p>
+      <ol class="explication-outil" style="margin:12px 0 0 20px">
+        <li>Authentication &rarr; Users &rarr; <strong>Add user</strong>,
+            email <code>prenom@kei.mg</code></li>
+        <li>Copier son <strong>User UID</strong></li>
+        <li>Realtime Database &rarr; Data &rarr; sous <code>roles</code>,
+            ajouter <code>UID : "admin"</code></li>
+      </ol>
+      <p class="avert-outil">
+        Sans l'entree dans <code>roles</code>, le compte existe mais reste un
+        client ordinaire : il ne pourra pas ouvrir cette page.
+      </p>
+    </details>
+
+
+    <p style="text-align:center;margin-top:20px">
+      <a href="index.html">&larr; Voir le site</a>
+      &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+      <a href="cuisine.html">Ecran cuisine &rarr;</a>
+    </p>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+  <script src="js/config.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/kei-firebase.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

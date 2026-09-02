@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KEI &middot; Commander en ligne</title>
+  <meta name="description" content="Consultez le menu du restaurant KEI et passez commande en ligne.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===== BANDEAU DU CLIENT CONNECTE ===== -->
+  <div class="barre-compte" id="barre-compte" hidden>
+    <span><span class="salut">Bonjour </span><strong id="compte-nom"></strong></span>
+    <span class="actions-compte">
+      <button id="btn-mes-infos">Mes informations</button>
+      <button id="btn-deconnexion-client">Se deconnecter</button>
+    </span>
+  </div>
+
+  <!-- ===== MES INFORMATIONS ===== -->
+  <div class="voile" id="voile-infos">
+    <div class="modale" role="dialog" aria-modal="true" aria-label="Mes informations">
+
+      <h3>
+        Mes informations
+        <button class="fermer" id="btn-fermer-infos" aria-label="Fermer">&times;</button>
+      </h3>
+
+      <p class="mi-compte">
+        Compte : <strong id="mi-identifiant"></strong><br>
+        <span>L'identifiant ne peut pas etre change. Demandez au restaurant.</span>
+      </p>
+
+      <h4 class="mi-titre">Mes coordonnees</h4>
+
+      <label for="mi-nom">Nom complet *</label>
+      <input type="text" id="mi-nom" placeholder="Ex : Hery Rakoto">
+
+      <label for="mi-telephone">Numero de telephone</label>
+      <input type="tel" id="mi-telephone" placeholder="Ex : 034 12 345 67">
+
+      <label for="mi-adresse">Adresse de livraison habituelle</label>
+      <input type="text" id="mi-adresse" placeholder="Quartier, rue, point de repere">
+
+      <button class="btn-envoyer" id="btn-enregistrer-infos">Enregistrer</button>
+      <p class="message-info" id="mi-message-profil"></p>
+
+      <hr class="mi-trait">
+
+      <h4 class="mi-titre">Changer mon mot de passe</h4>
+
+      <label for="mi-ancien">Mot de passe actuel</label>
+      <input type="password" id="mi-ancien" autocomplete="current-password">
+
+      <label for="mi-nouveau">Nouveau mot de passe (6 caracteres minimum)</label>
+      <input type="password" id="mi-nouveau" autocomplete="new-password">
+
+      <label for="mi-nouveau2">Repetez le nouveau mot de passe</label>
+      <input type="password" id="mi-nouveau2" autocomplete="new-password">
+
+      <button class="btn-secondaire" id="btn-changer-mdp">Changer le mot de passe</button>
+      <p class="message-info" id="mi-message-mdp"></p>
+
+    </div>
+  </div>
+
+  <!-- ===== EN-TETE ===== -->
+  <header>
+    <div class="logo" id="logo">KEI</div>
+    <p class="slogan" id="slogan"></p>
+    <div class="trait"></div>
+  </header>
+
+  <!-- ===== BARRE DES CATEGORIES (remplie par le JavaScript) ===== -->
+  <nav id="nav-categories"></nav>
+
+  <!-- ===== MES COMMANDES DU JOUR (remise a zero chaque jour) ===== -->
+  <section class="historique" id="historique" hidden aria-label="Mes commandes du jour">
+    <h2>Mes commandes du jour</h2>
+    <ul id="liste-historique"></ul>
+  </section>
+
+  <!-- ===== LE MENU (rempli par le JavaScript) ===== -->
+  <main id="menu"></main>
+
+  <!-- ===== COMMANDER UN PLAT QUI N'EST PAS AU MENU ===== -->
+  <section class="zone-hors-menu" id="hors-menu">
+    <div class="carte-hors-menu">
+      <h2>Une envie qui n'est pas au menu ?</h2>
+      <p class="hm-intro">
+        Ecrivez ce que vous souhaitez : la cuisine vous dira si elle peut
+        le preparer, et a quel prix.
+      </p>
+
+      <div class="form-hors-menu">
+        <input type="text" id="hm-texte"
+               placeholder="Ex : mine sao aux legumes, gateau d'anniversaire...">
+        <input type="number" id="hm-qte" min="1" value="1" aria-label="Quantite">
+        <button id="hm-ajouter">Ajouter</button>
+      </div>
+
+      <p class="hm-note">
+        Ces demandes apparaissent dans la commande avec la mention
+        <strong>prix a confirmer</strong> : elles ne sont pas comptees dans le total.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== PIED DE PAGE ===== -->
+  <footer>
+    <div class="nom" id="footer-nom">KEI</div>
+    <p id="footer-horaires"></p>
+    <p id="footer-adresse"></p>
+    <p style="margin-top:14px"><a href="admin.html">Espace restaurant</a></p>
+  </footer>
+
+  <!-- ===== BARRE DU PANIER (fixe en bas) ===== -->
+  <div class="barre-panier" id="barre-panier">
+    <div class="resume">
+      <span id="nb-articles">0 article</span><br>
+      <strong id="total-barre">0</strong>
+    </div>
+    <button id="btn-ouvrir-panier">Voir ma commande</button>
+  </div>
+
+  <!-- ===== FENETRE DU PANIER ===== -->
+  <div class="voile" id="voile">
+    <div class="modale" role="dialog" aria-modal="true" aria-label="Ma commande">
+
+      <!-- ---------- ETAPE 1 : composer la commande ---------- -->
+      <div id="etape-commande">
+
+        <h3>
+          Ma commande
+          <button class="fermer" id="btn-fermer" aria-label="Fermer">&times;</button>
+        </h3>
+
+        <div id="lignes-panier"></div>
+
+        <div class="total">
+          <span>Total</span>
+          <span id="total-modale">0</span>
+        </div>
+
+        <p class="note-total-hm" id="note-hors-menu" hidden>
+          + les demandes hors menu, dont le prix sera confirme par la cuisine.
+        </p>
+
+        <!-- Formulaire client -->
+        <label for="nom">Votre nom *</label>
+        <input type="text" id="nom" placeholder="Ex : Hery Rakoto">
+
+        <label for="mode">Type de commande *</label>
+        <select id="mode">
+          <option value="Sur place">Sur place</option>
+          <option value="A emporter">A emporter</option>
+          <option value="Livraison">Livraison</option>
+        </select>
+
+        <!-- Ce bloc n'apparait que si "Livraison" est choisi -->
+        <div id="bloc-adresse" hidden>
+          <label for="adresse">Adresse de livraison *</label>
+          <input type="text" id="adresse" placeholder="Quartier, rue, point de repere">
+        </div>
+
+        <label for="telephone">Votre numero de telephone *</label>
+        <input type="tel" id="telephone" placeholder="Ex : 034 12 345 67">
+
+        <label for="heure">Heure souhaitee</label>
+        <input type="text" id="heure" placeholder="Ex : 19h30 (ou laissez vide)">
+
+        <label for="remarque">Remarque generale sur la commande</label>
+        <textarea id="remarque" placeholder="Facultatif"></textarea>
+
+        <button class="btn-envoyer" id="btn-envoyer">
+          Envoyer la commande a la cuisine
+        </button>
+
+        <p class="note" id="note-envoi">
+          La commande part directement sur l'ecran de la cuisine.<br>
+          Vous suivrez sa preparation depuis cette page.
+        </p>
+
+      </div>
+
+      <!-- ---------- ETAPE 2 : confirmation et suivi ---------- -->
+      <div id="etape-confirmation" hidden>
+
+        <div class="confirm-coche">&#10003;</div>
+        <h3 class="confirm-titre">Commande envoyee</h3>
+
+        <p class="confirm-texte">Votre numero de commande :</p>
+        <div class="numero-commande" id="numero-commande">KEI-0000-000</div>
+
+        <!-- Suivi en direct : se met a jour quand la cuisine clique -->
+        <div class="suivi-direct" id="suivi-direct" hidden role="status" aria-live="polite">
+          <div class="pastille" id="pastille-statut"></div>
+          <div>
+            <strong id="texte-statut">En attente de la cuisine</strong>
+            <span>Cette ligne se met a jour toute seule.</span>
+          </div>
+        </div>
+
+        <p class="confirm-aide">
+          Gardez ce numero : la cuisine s'en sert pour retrouver votre commande.
+          Vous pouvez fermer la page, le suivi reprendra a votre retour.
+          La commande est effacee de nos serveurs au bout de quelques heures.
+        </p>
+
+        <button class="btn-secondaire" id="btn-nouvelle-commande">Passer une nouvelle commande</button>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== LES SCRIPTS (l'ordre est important) ===== -->
+
+  <!-- Firebase : c'est lui qui porte la commande jusqu'a la cuisine -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+  <script src="js/config.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/kei-firebase.js"></script>
+  <script src="js/notif.js"></script>
+  <script src="js/comptes.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>
