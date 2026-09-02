@@ -33,7 +33,7 @@ const MENU = [
       { id:"k2",  nom:"Misao",                          desc:"", prix:7000,
         choix:[ { nom:"Garniture", options:[ {nom:"Bœuf"}, {nom:"Œuf"}, {nom:"Poulet"} ] } ] },
 
-      { id:"k3",  nom:"Frite + poulet frit",            desc:"", prix:7000 },
+      { id:"k3",  nom:"Frites + poulet frit",            desc:"", prix:7000 },
       { id:"k4",  nom:"Riz + boulettes de viande sauce", desc:"", prix:7000 },
       { id:"k5",  nom:"Riz + bœuf sauce",               desc:"", prix:7000 },
       { id:"k6",  nom:"Riz + poulet sauce curry",       desc:"", prix:7000 },
