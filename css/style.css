@@ -748,3 +748,75 @@ body.verrouille{ overflow:hidden; }
 @media (max-width:520px){
   .hist-refaire{ padding:9px 16px; font-size:13px; }
 }
+
+
+/* ============================================================
+   22. LES CHOIX D'UN PLAT
+   ------------------------------------------------------------
+   Poulet / Boeuf, Ketchup / Mayonnaise... Un groupe pose une
+   question, on n'y repond qu'une fois. Les boutons vivent sous
+   le nom du plat, dans .plat-infos.
+   ============================================================ */
+/* Les choix occupent toute la largeur de la carte du plat :
+   .plat passe donc en flex-wrap, et ce bloc va a la ligne. */
+.plat{ flex-wrap:wrap; }
+.plat-choix{
+  flex:0 0 100%;
+  margin-top:11px;
+  display:flex; flex-direction:column; gap:7px;
+}
+
+.groupe-choix{
+  display:flex; align-items:center; flex-wrap:wrap; gap:6px;
+}
+
+/* L'intitule prend toute la largeur : les options s'alignent
+   proprement en dessous, meme quand elles sont trois. */
+.nom-choix{
+  flex:0 0 100%;
+  font-size:11.5px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--encre-doux);
+  margin-bottom:1px;
+}
+
+/* Question encore sans reponse : on le dit, sinon le client ne
+   comprend pas pourquoi le bouton + est eteint. */
+.groupe-choix.sans-reponse .nom-choix{ color:var(--accent); }
+
+.option-choix{
+  border:1px solid var(--bordure);
+  background:var(--papier);
+  color:var(--encre-doux);
+  border-radius:999px;
+  padding:5px 13px;
+  font-family:inherit; font-size:13.5px;
+  cursor:pointer;
+  transition:background var(--temps) var(--courbe),
+             color      var(--temps) var(--courbe),
+             border-color var(--temps) var(--courbe);
+}
+.option-choix:hover{ border-color:var(--encre-doux); color:var(--encre); }
+
+/* L'option retenue est un ETAT, pas une action : elle prend donc
+   le vert sourd. Le vermillon reste reserve aux boutons qui font
+   quelque chose (ajouter, envoyer). */
+.option-choix.choisi{
+  background:var(--valide); border-color:var(--valide);
+  color:#fff; font-weight:600;
+}
+.option-choix.choisi:hover{ color:#fff; }
+
+/* Tant qu'il reste une question sans reponse, le + est eteint :
+   on ne devine pas a la place du client ce qu'il veut manger. */
+.compteur .plus:disabled{
+  opacity:.3; cursor:not-allowed;
+}
+.compteur .plus:disabled:hover{
+  background:#fff; color:var(--encre); border-color:var(--bordure);
+}
+
+/* Sur telephone, ces petits boutons doivent se viser au pouce.
+   Regle placee APRES la regle de base pour qu'elle l'emporte. */
+@media (max-width:600px){
+  .option-choix{ padding:7px 13px; font-size:13.5px; }
+}

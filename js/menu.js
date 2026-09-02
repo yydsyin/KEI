@@ -1,47 +1,61 @@
 /* ============================================================
-   LE MENU DU RESTAURANT
+   LE MENU DU RESTAURANT KEI
    ------------------------------------------------------------
-   /!\ MENU D'EXEMPLE /!\  (prix en ariary)
-   Il sera remplace par le vrai menu de KEI.
+   Prix en ariary, sans centimes.
 
    Structure : une liste de categories.
    Chaque categorie contient une liste de plats.
    Chaque plat a : un id unique, un nom, une description, un prix.
+
+   Un plat peut aussi avoir des CHOIX (les "sous-options") :
+
+     choix : [
+       { nom:"Garniture", options:[ {nom:"Poulet"}, {nom:"Jambon"} ] }
+     ]
+
+   Le client doit choisir une option par groupe avant de pouvoir
+   ajouter le plat. Une option peut couter un supplement :
+   { nom:"Poulet", supplement:500 }. Sans supplement, c'est 0.
+
+   Pour l'instant tout est dans une seule categorie : les vraies
+   categories seront confirmees aupres du chef. Quand il n'y en a
+   qu'une, le site n'affiche pas son titre.
    ============================================================ */
 
 const MENU = [
   {
-    categorie : "Entrees",
+    categorie : "La carte",
     plats : [
-      { id:"e1", nom:"Salade de saison",   desc:"Legumes frais du marche",       prix:6000 },
-      { id:"e2", nom:"Soupe du jour",      desc:"Preparee chaque matin",         prix:5000 },
-      { id:"e3", nom:"Samboussas (x4)",    desc:"Farcis viande ou legumes",      prix:4000 }
-    ]
-  },
-  {
-    categorie : "Plats",
-    plats : [
-      { id:"p1", nom:"Poulet roti",        desc:"Accompagne de riz",             prix:18000 },
-      { id:"p2", nom:"Riz cantonais",      desc:"Riz saute, oeuf, legumes",      prix:15000 },
-      { id:"p3", nom:"Poisson du jour",    desc:"Selon arrivage, legumes",       prix:22000 },
-      { id:"p4", nom:"Mine sao",           desc:"Nouilles sautees",              prix:14000 }
-    ]
-  },
-  {
-    categorie : "Desserts",
-    plats : [
-      { id:"d1", nom:"Gateau au chocolat", desc:"Fait maison",                   prix:7000 },
-      { id:"d2", nom:"Salade de fruits",   desc:"Fruits de saison",              prix:6000 },
-      { id:"d3", nom:"Glace (2 boules)",   desc:"Vanille, chocolat ou fraise",   prix:5000 }
-    ]
-  },
-  {
-    categorie : "Boissons",
-    plats : [
-      { id:"b1", nom:"Eau minerale 50cl",  desc:"Plate ou gazeuse",              prix:2000 },
-      { id:"b2", nom:"Soda 33cl",          desc:"Cola, limonade, orange",        prix:3000 },
-      { id:"b3", nom:"Jus naturel",        desc:"Presse du jour",                prix:5000 },
-      { id:"b4", nom:"Cafe",               desc:"Expresso",                      prix:2500 }
+
+      { id:"k1",  nom:"Riz cantonnais",                 desc:"", prix:7000,
+        choix:[ { nom:"Viande", options:[ {nom:"Poulet"}, {nom:"Bœuf"} ] } ] },
+
+      { id:"k2",  nom:"Misao",                          desc:"", prix:7000,
+        choix:[ { nom:"Garniture", options:[ {nom:"Bœuf"}, {nom:"Œuf"}, {nom:"Poulet"} ] } ] },
+
+      { id:"k3",  nom:"Frite + poulet frit",            desc:"", prix:7000 },
+      { id:"k4",  nom:"Riz + boulettes de viande sauce", desc:"", prix:7000 },
+      { id:"k5",  nom:"Riz + bœuf sauce",               desc:"", prix:7000 },
+      { id:"k6",  nom:"Riz + poulet sauce curry",       desc:"", prix:7000 },
+
+      { id:"k7",  nom:"Pâtes sèches",                  desc:"", prix:7000,
+        choix:[ { nom:"Garniture", options:[ {nom:"Bœuf"}, {nom:"Œuf"}, {nom:"Poulet"} ] } ] },
+
+      { id:"k8",  nom:"Riz + bœuf avec carotte",        desc:"", prix:7000 },
+      { id:"k9",  nom:"Riz + ailes de poulet sauce",    desc:"", prix:8000 },
+
+      { id:"k10", nom:"Nem",                            desc:"À l'unité", prix:1500 },
+      { id:"k11", nom:"Sambos",                         desc:"À l'unité", prix:1500 },
+
+      { id:"k12", nom:"Panini",                         desc:"", prix:7000,
+        choix:[ { nom:"Garniture", options:[ {nom:"Poulet"}, {nom:"Jambon"} ] } ] },
+
+      { id:"k13", nom:"Sandwich",                       desc:"", prix:7000,
+        choix:[ { nom:"Garniture", options:[ {nom:"Poulet"}, {nom:"Jambon"} ] } ] },
+
+      { id:"k14", nom:"Frites",                         desc:"", prix:2500,
+        choix:[ { nom:"Sauce", options:[ {nom:"Ketchup"}, {nom:"Mayonnaise"} ] } ] }
+
     ]
   }
 ];

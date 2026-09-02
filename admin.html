@@ -132,8 +132,39 @@
     details.bloc-outil summary h2{ margin:0; font-size:19px; }
     details.bloc-outil > *:last-child{ padding-bottom:20px; }
 
+    /* ---- les choix d'un plat (les sous-options) ---- */
+    .choix-edit{
+      margin:0 0 16px 0; padding-left:14px;
+      border-left:2px solid var(--bordure);
+    }
+    .groupe-edit{
+      background:var(--papier); border:1px solid var(--bordure);
+      border-radius:10px; padding:12px; margin-bottom:8px;
+    }
+    .groupe-entete{ display:flex; gap:8px; align-items:center; margin-bottom:9px; }
+    .groupe-entete input{ flex:1; padding:8px 10px; font-size:14px; font-weight:600; }
+    .option-edit{
+      display:grid; grid-template-columns:1fr 100px 38px;
+      gap:8px; align-items:center; margin-bottom:6px;
+    }
+    .option-edit input{ padding:8px 10px; font-size:14px; }
+    .entetes-choix{
+      display:grid; grid-template-columns:1fr 100px 38px; gap:8px;
+      font-size:11.5px; color:var(--encre-doux); margin-bottom:5px;
+    }
+    .entetes-choix span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .note-choix{ font-size:12.5px; color:var(--accent); margin:2px 0 8px; }
+    .lien-choix{
+      background:none; border:none; padding:4px 0;
+      color:var(--encre-doux); font-family:inherit; font-size:13px;
+      cursor:pointer; text-decoration:underline;
+    }
+    .lien-choix:hover{ color:var(--accent); }
+    .lien-choix.fort{ color:var(--accent); font-size:13.5px; }
+
     @media (max-width:600px){
       .ligne-edit, .entetes-colonnes{ grid-template-columns:1fr 1fr 70px 34px; }
+      .option-edit, .entetes-choix{ grid-template-columns:1fr 78px 34px; }
       .form-outil{ flex-direction:column; }
       .code-genere{ font-size:30px; letter-spacing:5px; }
     }

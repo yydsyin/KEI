@@ -41,12 +41,11 @@ const FIREBASE_CONFIG = {
 
 /* ------------------------------------------------------------
    3. LES COMPTES
-      Tous les comptes, clients comme chef, se creent dans la
-      console Firebase : Authentication > Users > Add user.
-      Ce qui distingue le chef, c'est son UID, ecrit dans les
-      regles de securite : lui seul a le droit de lire la liste
-      des commandes.
-      Ces comptes n'ont rien a voir avec les administrateurs
-      (js/admins.js), qui ne servent qu'a modifier le menu.
+      Tous les comptes se creent dans la console Firebase :
+      Authentication > Users > Add user.
+      Ce qui distingue un compte, c'est son role, ecrit dans la
+      table roles/{uid} de la base : "chef", "admin", ou rien du
+      tout pour un client. Les regles de securite s'appuient
+      dessus : seul le chef peut lire la liste des commandes.
    ------------------------------------------------------------ */
 const CHEF_EMAIL_EXEMPLE = "chef";   /* affiche dans le champ de l'ecran cuisine */

@@ -125,6 +125,9 @@ function afficherFormulaireMenu(){
       ligne.appendChild(cNom); ligne.appendChild(cDesc);
       ligne.appendChild(cPrix); ligne.appendChild(sup);
       bloc.appendChild(ligne);
+
+      /* juste sous le plat : ses choix (Poulet / Boeuf...) */
+      bloc.appendChild(editeurDeChoix(iCat, iPlat));
     });
 
     /* --- bouton "ajouter un plat" --- */
@@ -140,6 +143,134 @@ function afficherFormulaireMenu(){
 
     zone.appendChild(bloc);
   });
+}
+
+/* ------------------------------------------------------------
+   4 bis. LES CHOIX D'UN PLAT  (les "sous-options")
+
+   Un plat peut poser une ou plusieurs questions au client :
+   "Garniture : Poulet ou Jambon", "Sauce : Ketchup ou Mayonnaise".
+   Chaque question est un groupe, chaque reponse une option.
+
+   Une option peut couter un supplement (0 la plupart du temps) :
+   il s'ajoute au prix du plat au moment de la commande.
+   ------------------------------------------------------------ */
+function editeurDeChoix(iCat, iPlat){
+  const plat = brouillon[iCat].plats[iPlat];
+  const zone = document.createElement("div");
+  zone.className = "choix-edit";
+
+  (plat.choix || []).forEach(function(groupe, iGroupe){
+
+    const blocGroupe = document.createElement("div");
+    blocGroupe.className = "groupe-edit";
+
+    /* --- l'entete : le nom de la question --- */
+    const entete = document.createElement("div");
+    entete.className = "groupe-entete";
+
+    const nomGroupe = document.createElement("input");
+    nomGroupe.type = "text";
+    nomGroupe.value = groupe.nom || "";
+    nomGroupe.placeholder = "Nom du choix : Garniture, Sauce, Viande...";
+    nomGroupe.oninput = function(){ groupe.nom = this.value; };
+
+    const supGroupe = document.createElement("button");
+    supGroupe.className = "sup-btn";
+    supGroupe.style.padding = "8px 12px";
+    supGroupe.textContent = "Supprimer ce choix";
+    supGroupe.onclick = function(){
+      plat.choix.splice(iGroupe, 1);
+      if (plat.choix.length === 0) delete plat.choix;
+      afficherFormulaireMenu();
+    };
+
+    entete.appendChild(nomGroupe);
+    entete.appendChild(supGroupe);
+    blocGroupe.appendChild(entete);
+
+    /* --- les reponses possibles --- */
+    if (groupe.options && groupe.options.length) {
+      const titres = document.createElement("div");
+      titres.className = "entetes-choix";
+      titres.innerHTML = "<span>Option</span><span>Supplement</span><span></span>";
+      blocGroupe.appendChild(titres);
+    }
+
+    (groupe.options || []).forEach(function(option, iOption){
+      const ligneOption = document.createElement("div");
+      ligneOption.className = "option-edit";
+
+      const nomOption = document.createElement("input");
+      nomOption.type = "text";
+      nomOption.value = option.nom || "";
+      nomOption.placeholder = "Poulet";
+      nomOption.oninput = function(){ option.nom = this.value; };
+
+      const supplement = document.createElement("input");
+      supplement.type = "number"; supplement.step = "500"; supplement.min = "0";
+      supplement.value = option.supplement || 0;
+      supplement.placeholder = "0";
+      supplement.title = "Supplement de prix, 0 si l'option ne coute rien de plus";
+      supplement.oninput = function(){
+        const valeur = parseFloat(this.value) || 0;
+        if (valeur === 0) delete option.supplement;
+        else option.supplement = valeur;
+      };
+
+      const supOption = document.createElement("button");
+      supOption.className = "sup-btn";
+      supOption.innerHTML = "&#10005;";
+      supOption.title = "Supprimer cette option";
+      supOption.onclick = function(){
+        groupe.options.splice(iOption, 1);
+        afficherFormulaireMenu();
+      };
+
+      ligneOption.appendChild(nomOption);
+      ligneOption.appendChild(supplement);
+      ligneOption.appendChild(supOption);
+      blocGroupe.appendChild(ligneOption);
+    });
+
+    /* Un groupe sans option ne peut recevoir aucune reponse : le
+       site l'ignore. On le dit ici plutot que de laisser croire
+       que le plat est pret. */
+    const nommees = (groupe.options || []).filter(function(o){
+      return o.nom && o.nom.trim() !== "";
+    });
+    if (nommees.length === 0) {
+      const note = document.createElement("p");
+      note.className = "note-choix";
+      note.textContent = "Ce choix n'a encore aucune option nommee : le site ne l'affichera pas.";
+      blocGroupe.appendChild(note);
+    }
+
+    const ajoutOption = document.createElement("button");
+    ajoutOption.className = "lien-choix";
+    ajoutOption.textContent = "+ Ajouter une option";
+    ajoutOption.onclick = function(){
+      groupe.options = groupe.options || [];
+      groupe.options.push({ nom: "" });
+      afficherFormulaireMenu();
+    };
+    blocGroupe.appendChild(ajoutOption);
+
+    zone.appendChild(blocGroupe);
+  });
+
+  /* --- ajouter une question a ce plat --- */
+  const ajoutGroupe = document.createElement("button");
+  ajoutGroupe.className = "lien-choix fort";
+  ajoutGroupe.textContent = "+ Ajouter un choix a ce plat";
+  ajoutGroupe.onclick = function(){
+    plat.choix = plat.choix || [];
+    plat.choix.push({ nom: "Choix", options: [ { nom: "" }, { nom: "" } ] });
+    afficherFormulaireMenu();
+  };
+  zone.appendChild(ajoutGroupe);
+
+  return zone;
 }
 
 /* ------------------------------------------------------------

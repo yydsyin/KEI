@@ -27,8 +27,14 @@ const menuActuel = chargerMenu();
 const panier = {};
 
 /* Les precisions demandees pour chaque plat :
-   { identifiantDuPlat : "sans oignon" } */
+   { identifiantDeLigne : "sans oignon" } */
 const precisions = {};
+
+/* Ce que le client a coche devant chaque plat a options :
+   { "k12" : ["Poulet"] }, un element par groupe de choix.
+   Tant qu'un groupe n'a pas de reponse, le bouton + reste
+   desactive : mieux vaut bloquer que deviner a sa place. */
+const choixEnCours = {};
 
 /* Les demandes qui ne figurent pas au menu :
    une liste d'objets { texte, quantite, precision }.
@@ -62,14 +68,101 @@ function prixEnTexte(nombre){
   return texte + " " + CONFIG.devise;
 }
 
-/* Retrouver un plat a partir de son identifiant */
-function trouverPlat(id){
+/* ------------------------------------------------------------
+   LES LIGNES DU PANIER
+
+   Un plat peut avoir des choix (Poulet / Boeuf...). "Panini
+   poulet" et "Panini jambon" doivent alors compter comme deux
+   lignes differentes. On identifie donc une ligne par le plat
+   ET par ses options :
+
+       "k12#Poulet"   Panini poulet
+       "k3"           Frite + poulet frit (aucun choix)
+
+   Le panier est range par ces identifiants de ligne.
+   ------------------------------------------------------------ */
+function idLigne(platId, options){
+  return (options && options.length) ? platId + "#" + options.join("|") : platId;
+}
+
+function platDeLaLigne(idL){
+  return idL.split("#")[0];
+}
+
+function optionsDeLaLigne(idL){
+  const morceaux = idL.split("#");
+  return (morceaux.length > 1 && morceaux[1] !== "") ? morceaux[1].split("|") : [];
+}
+
+/* Retrouver un plat a partir d'un identifiant de ligne */
+function trouverPlat(idL){
+  const platId = platDeLaLigne(idL);
   for (const categorie of menuActuel) {
     for (const plat of categorie.plats) {
-      if (plat.id === id) return plat;
+      if (plat.id === platId) return plat;
     }
   }
   return null;
+}
+
+/* Le nom a afficher : "Panini (Poulet)" */
+function nomDeLaLigne(idL){
+  const plat = trouverPlat(idL);
+  if (!plat) return "";
+  const options = optionsDeLaLigne(idL);
+  return options.length ? plat.nom + " (" + options.join(", ") + ")" : plat.nom;
+}
+
+/* Le prix : celui du plat, plus les supplements des options choisies */
+function prixDeLaLigne(idL){
+  const plat = trouverPlat(idL);
+  if (!plat) return 0;
+
+  let prix = plat.prix;
+  optionsDeLaLigne(idL).forEach(function(nomOption){
+    (plat.choix || []).forEach(function(groupe){
+      (groupe.options || []).forEach(function(option){
+        if (option.nom === nomOption) prix += (option.supplement || 0);
+      });
+    });
+  });
+  return prix;
+}
+
+/* Les groupes de choix reellement utilisables.
+
+   Dans la page admin, un choix se cree vide : on tape son nom,
+   puis celui de ses options. Entre-temps le menu contient des
+   groupes a moitie remplis. Un groupe sans option nommee ne peut
+   recevoir aucune reponse : il rendrait le plat impossible a
+   commander. On l'ignore donc jusqu'a ce qu'il soit pret. */
+function groupesDuPlat(plat){
+  return (plat.choix || [])
+    .map(function(groupe){
+      return {
+        nom : groupe.nom,
+        options : (groupe.options || []).filter(function(option){
+          return option.nom && option.nom.trim() !== "";
+        })
+      };
+    })
+    .filter(function(groupe){ return groupe.options.length > 0; });
+}
+
+/* Cette ligne est-elle encore commandable ? Le plat doit exister,
+   et chacune de ses options doit toujours figurer au menu. Sert
+   quand on refait une commande passee : la carte a pu changer. */
+function ligneEncoreValide(idL){
+  const plat = trouverPlat(idL);
+  if (!plat) return false;
+
+  const groupes = groupesDuPlat(plat);
+  const options = optionsDeLaLigne(idL);
+  if (options.length !== groupes.length) return false;
+
+  return groupes.every(function(groupe, i){
+    return (groupe.options || []).some(function(o){ return o.nom === options[i]; });
+  });
 }
 
 /* ============================================================
@@ -110,23 +203,32 @@ function afficherMenu(){
     return;
   }
 
+  /* Tant que le restaurant n'a qu'une seule categorie, son titre
+     et son bouton de navigation n'apprennent rien au client : on
+     ne les affiche pas. Des qu'il y en a deux, ils reviennent. */
+  const uneSeuleCategorie = (menuActuel.length === 1);
+
   menuActuel.forEach(function(categorie, numero){
     const ancre = "cat" + numero;
 
     /* --- le bouton dans la barre du haut --- */
-    const lien = document.createElement("a");
-    lien.href = "#" + ancre;
-    lien.textContent = categorie.categorie;
-    zoneNav.appendChild(lien);
+    if (!uneSeuleCategorie) {
+      const lien = document.createElement("a");
+      lien.href = "#" + ancre;
+      lien.textContent = categorie.categorie;
+      zoneNav.appendChild(lien);
+    }
 
     /* --- la section de la categorie --- */
     const section = document.createElement("section");
     section.className = "categorie";
     section.id = ancre;
 
-    const titre = document.createElement("h2");
-    titre.textContent = categorie.categorie;
-    section.appendChild(titre);
+    if (!uneSeuleCategorie) {
+      const titre = document.createElement("h2");
+      titre.textContent = categorie.categorie;
+      section.appendChild(titre);
+    }
 
     /* --- chaque plat --- */
     categorie.plats.forEach(function(plat){
@@ -149,9 +251,18 @@ function afficherMenu(){
       ligne.querySelector(".plat-desc").textContent = plat.desc || "";
       ligne.querySelector(".plat-prix").textContent = prixEnTexte(plat.prix);
 
-      /* Les deux boutons + et - */
-      ligne.querySelector(".plus").onclick  = function(){ modifierQuantite(plat.id, +1); };
-      ligne.querySelector(".moins").onclick = function(){ modifierQuantite(plat.id, -1); };
+      /* --- les choix du plat, quand il en a --- */
+      if (groupesDuPlat(plat).length) {
+        choixEnCours[plat.id] = choixEnCours[plat.id] || [];
+        /* les choix passent sous toute la carte, pas dans la
+           colonne du nom : les options tiennent alors sur une
+           seule ligne au lieu de s'empiler */
+        ligne.appendChild(construireChoix(plat));
+      }
+
+      /* Les boutons + et - agissent sur la combinaison choisie */
+      ligne.querySelector(".plus").onclick  = function(){ ajusterPlat(plat, +1); };
+      ligne.querySelector(".moins").onclick = function(){ ajusterPlat(plat, -1); };
 
       /* On garde l'identifiant pour pouvoir mettre a jour l'affichage */
       ligne.dataset.id = plat.id;
@@ -167,6 +278,66 @@ function afficherMenu(){
   lienHM.className = "chip-hm";
   lienHM.textContent = "Hors menu";
   zoneNav.appendChild(lienHM);
+}
+
+/* ------------------------------------------------------------
+   Les boutons de choix affiches sous le nom d'un plat.
+   Un groupe = une question ("Garniture :"), une reponse a la fois.
+   ------------------------------------------------------------ */
+function construireChoix(plat){
+  const zone = document.createElement("div");
+  zone.className = "plat-choix";
+
+  groupesDuPlat(plat).forEach(function(groupe, iGroupe){
+    const bloc = document.createElement("div");
+    bloc.className = "groupe-choix";
+    bloc.dataset.groupe = iGroupe;
+
+    const etiquette = document.createElement("span");
+    etiquette.className = "nom-choix";
+    etiquette.textContent = groupe.nom;
+    bloc.appendChild(etiquette);
+
+    (groupe.options || []).forEach(function(option){
+      const bouton = document.createElement("button");
+      bouton.type = "button";
+      bouton.className = "option-choix";
+      bouton.textContent = option.nom +
+        (option.supplement ? " +" + prixEnTexte(option.supplement) : "");
+      bouton.dataset.groupe = iGroupe;
+      bouton.dataset.option = option.nom;
+      bouton.onclick = function(){
+        choixEnCours[plat.id][iGroupe] = option.nom;
+        rafraichirAffichage();
+      };
+      bloc.appendChild(bouton);
+    });
+
+    zone.appendChild(bloc);
+  });
+
+  return zone;
+}
+
+/* Toutes les questions du plat ont-elles une reponse ? */
+function choixComplet(plat){
+  const groupes = groupesDuPlat(plat);
+  if (!groupes.length) return true;
+  const faits = choixEnCours[plat.id] || [];
+  return groupes.every(function(groupe, i){ return !!faits[i]; });
+}
+
+/* La ligne de panier qui correspond a ce qui est coche maintenant */
+function ligneChoisie(plat){
+  const groupes = groupesDuPlat(plat);
+  if (!groupes.length) return plat.id;
+  return idLigne(plat.id, (choixEnCours[plat.id] || []).slice(0, groupes.length));
+}
+
+/* Le + et le - places a cote d'un plat du menu */
+function ajusterPlat(plat, variation){
+  if (!choixComplet(plat)) return;   /* le + est deja desactive : ceinture et bretelles */
+  modifierQuantite(ligneChoisie(plat), variation);
 }
 
 /* ============================================================
@@ -194,7 +365,7 @@ function calculerTotaux(){
     const plat = trouverPlat(id);
     if (!plat) continue;
     articles += panier[id];
-    somme    += panier[id] * plat.prix;
+    somme    += panier[id] * prixDeLaLigne(id);
   }
   return { articles: articles, somme: somme };
 }
@@ -212,7 +383,31 @@ function rafraichirAffichage(){
 
   /* --- les compteurs a cote de chaque plat --- */
   document.querySelectorAll(".plat").forEach(function(ligne){
-    const quantite = panier[ligne.dataset.id] || 0;
+    const plat = trouverPlat(ligne.dataset.id);
+    if (!plat) return;
+
+    /* on souligne l'option cochee dans chaque groupe */
+    ligne.querySelectorAll(".option-choix").forEach(function(bouton){
+      const coche = (choixEnCours[plat.id] || [])[Number(bouton.dataset.groupe)];
+      bouton.classList.toggle("choisi", coche === bouton.dataset.option);
+    });
+
+    /* une question sans reponse s'annonce : son intitule passe en
+       vermillon, sinon le client ne comprend pas pourquoi le +
+       reste eteint */
+    ligne.querySelectorAll(".groupe-choix").forEach(function(groupe){
+      const coche = (choixEnCours[plat.id] || [])[Number(groupe.dataset.groupe)];
+      groupe.classList.toggle("sans-reponse", !coche);
+    });
+
+    /* tant que le choix n'est pas fait, on ne peut pas ajouter */
+    const complet = choixComplet(plat);
+    const plus = ligne.querySelector(".plus");
+    plus.disabled = !complet;
+    plus.title    = complet ? "" : "Faites votre choix d'abord";
+
+    /* le compteur montre la quantite de la combinaison cochee */
+    const quantite = complet ? (panier[ligneChoisie(plat)] || 0) : 0;
     const moins = ligne.querySelector(".moins");
     const qte   = ligne.querySelector(".qte");
     moins.hidden = (quantite === 0);
@@ -247,8 +442,8 @@ function rafraichirAffichage(){
     ligne.className = "ligne-panier";
     ligne.innerHTML = '<span class="txt"></span><span><span class="pr"></span> ' +
                       '<button class="sup" title="Retirer">&#10005;</button></span>';
-    ligne.querySelector(".txt").textContent = panier[id] + " x " + plat.nom;
-    ligne.querySelector(".pr").textContent  = prixEnTexte(panier[id] * plat.prix);
+    ligne.querySelector(".txt").textContent = panier[id] + " x " + nomDeLaLigne(id);
+    ligne.querySelector(".pr").textContent  = prixEnTexte(panier[id] * prixDeLaLigne(id));
     ligne.querySelector(".sup").onclick = function(){
       delete panier[id];
       delete precisions[id];
@@ -444,9 +639,9 @@ async function envoyerCommande(){
   for (const id in panier) {
     const plat = trouverPlat(id);
     if (!plat) continue;
-    const sousTotal = panier[id] * plat.prix;
+    const sousTotal = panier[id] * prixDeLaLigne(id);
     total += sousTotal;
-    lignesPlats.push("- " + panier[id] + " x " + plat.nom + "  ...  " + prixEnTexte(sousTotal));
+    lignesPlats.push("- " + panier[id] + " x " + nomDeLaLigne(id) + "  ...  " + prixEnTexte(sousTotal));
     if (precisions[id]) lignesPlats.push("   > " + precisions[id]);
   }
 
@@ -716,8 +911,14 @@ function recommander(commande){
   let repris = 0, disparus = 0;
 
   for (const id in (commande.plats || {})) {
-    if (trouverPlat(id)) {
+    if (ligneEncoreValide(id)) {
       panier[id] = commande.plats[id];
+
+      /* on recoche les options de cette ligne, pour que le compteur
+         du menu corresponde a ce qui vient d'etre remis au panier */
+      const options = optionsDeLaLigne(id);
+      if (options.length) choixEnCours[platDeLaLigne(id)] = options;
+
       if (commande.precisions && commande.precisions[id]) {
         precisions[id] = commande.precisions[id];
       }

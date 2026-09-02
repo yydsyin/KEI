@@ -15,7 +15,7 @@ Trois pages :
 |---|---|---|
 | `index.html` | les clients | voir le menu et commander |
 | `cuisine.html` | le chef | voir les commandes arriver, en direct |
-| `admin.html` | le restaurant | modifier le menu, gérer les comptes |
+| `admin.html` | le restaurant | modifier le menu et les choix des plats |
 
 ---
 
@@ -72,25 +72,22 @@ decimales     : 0,        // l'ariary ne s'écrit pas avec des centimes
 Toujours dans `js/config.js` : `fraisLivraison : 3000`.
 Mettre `0` s'il n'y a pas de livraison.
 
-### c) Changer les mots de passe administrateurs
+### c) Créer les comptes
 
-Les comptes de l'équipe sont dans `js/admins.js`. Deux sont livrés :
+Il n'y a **aucun mot de passe dans le code du site**. Tous les comptes,
+clients comme internes, se créent dans la console Firebase :
+**Authentication → Users → Add user**, avec une adresse de la forme
+`identifiant@kei.mg`.
 
-| Identifiant | Mot de passe | Rôle |
-|-------------|--------------|------|
-| `yin`  | `kei2024`  | Propriétaire |
-| `chef` | `chef2024` | Cuisine |
+Le rôle se donne ensuite dans **Realtime Database → `roles`** :
+`UID : "chef"` ou `UID : "admin"`. Un compte sans entrée dans `roles` est
+un client. Voir la section 5 pour le détail.
 
-**Changez-les avant la mise en ligne.** Le plus simple : connectez-vous à
-`admin.html`, section **Administrateurs**, créez les vrais comptes, cliquez
-sur **Télécharger admins.js** et remplacez le fichier sur GitHub. Puis
-supprimez les deux comptes d'exemple du fichier.
-
-> ⚠️ Les mots de passe **administrateurs** sont vérifiés dans le navigateur,
-> donc contournables. C'est assumé : `admin.html` ne modifie que l'affichage
-> du menu, il n'y a aucune donnée personnelle derrière. Les comptes clients
-> et le compte chef, eux, sont vérifiés par Firebase : ceux-là sont
-> réellement protégés.
+> ⚠️ Le rôle **chef** est appliqué par les règles Firebase, donc côté
+> serveur : personne ne peut lire les commandes sans lui. Le rôle **admin**
+> n'est vérifié que dans le navigateur, ce qui est assumé — `admin.html` ne
+> modifie que l'affichage du menu, il n'y a aucune donnée personnelle
+> derrière.
 
 ---
 
@@ -683,16 +680,37 @@ fichier `js/menu.js` sur GitHub par celui qui vient d'être téléchargé.
 > dans le navigateur). C'est normal : sans serveur, un site ne peut pas
 > retenir des données pour tout le monde.
 
-### Ajouter un administrateur
+### Les choix d'un plat (les sous-options)
 
-Même principe : `admin.html` → section **Administrateurs** → remplissez
-identifiant, nom affiché, rôle et mot de passe → **Ajouter cet
-administrateur** → **Télécharger admins.js** → remplacez `js/admins.js`
-sur GitHub. Tant que le fichier n'est pas remplacé, le nouveau compte
-n'existe que sur l'ordinateur où vous l'avez créé.
+Un plat peut poser une question au client : *Garniture : Poulet ou
+Jambon*. Dans `admin.html`, sous chaque plat, **+ Ajouter un choix à ce
+plat**, puis **+ Ajouter une option** pour chaque réponse possible. Une
+option peut coûter un **supplément** (0 la plupart du temps) : il s'ajoute
+au prix du plat.
 
-Le mot de passe n'apparaît nulle part dans le fichier téléchargé : seule
-son empreinte SHA-256 y figure.
+Dans `js/menu.js`, cela s'écrit :
+
+```js
+{ id:"k12", nom:"Panini", desc:"", prix:7000,
+  choix:[ { nom:"Garniture", options:[ {nom:"Poulet"}, {nom:"Jambon"} ] } ] }
+```
+
+Trois choses à savoir :
+
+- tant qu'une question n'a pas de réponse, le bouton **+** reste éteint et
+  l'intitulé passe en vermillon. Le site ne devine pas à la place du
+  client ce qu'il veut manger ;
+- « Panini poulet » et « Panini jambon » sont **deux lignes distinctes**
+  du panier, et le choix apparaît sur la commande reçue en cuisine ;
+- un choix encore vide, ou dont aucune option n'est nommée, est
+  **ignoré** par le site. On peut donc enregistrer un menu à moitié
+  modifié sans empêcher personne de commander.
+
+### Ajouter un compte
+
+Les comptes ne sont plus dans un fichier du site : ils vivent dans
+**Firebase Authentication**, et leur rôle dans la table `roles` de la base.
+Voir la section 5, *Les comptes et les rôles*.
 
 ---
 
