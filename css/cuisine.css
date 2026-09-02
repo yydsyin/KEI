@@ -1,0 +1,245 @@
+/* ============================================================
+   PAGE CUISINE  --  Restaurant KEI
+   Ecran sombre : plus lisible en cuisine, moins fatigant, et
+   la batterie tient plus longtemps sur un ecran OLED.
+   ============================================================ */
+
+.page-cuisine{
+  background:#141310;
+  color:#f2ede4;
+  padding-bottom:0;
+}
+
+/* ---------- Ecran de connexion ---------- */
+.ecran-cuisine{
+  position:fixed; inset:0; z-index:100;
+  display:flex; align-items:center; justify-content:center;
+  padding:22px; overflow-y:auto;
+  background:#141310;
+}
+.carte-cuisine{
+  background:#211f1b;
+  border:1px solid #3a352d;
+  border-radius:16px;
+  width:100%; max-width:380px;
+  padding:30px 26px;
+}
+.logo-cuisine{
+  font-family:var(--police-titre); font-size:30px;
+  text-align:center; color:#f2ede4;
+}
+.sous-cuisine{
+  text-align:center; color:#8d8579; font-size:13px;
+  letter-spacing:3px; text-transform:uppercase;
+  margin-bottom:22px;
+}
+.carte-cuisine label{ color:#8d8579; }
+.carte-cuisine input{
+  background:#2c2924; border-color:#3a352d; color:#f2ede4;
+}
+.carte-cuisine input:focus{ outline:2px solid var(--accent); }
+
+.btn-cuisine{
+  width:100%; margin-top:22px;
+  background:var(--accent); color:#fff;
+  border:none; border-radius:11px;
+  padding:15px; font-size:16px; font-weight:600;
+  cursor:pointer;
+}
+.btn-cuisine:hover:not(:disabled){ background:var(--accent-fonce); }
+.btn-cuisine:disabled{ background:#3a352d; color:#6b645a; cursor:not-allowed; }
+
+.erreur-cuisine{
+  color:#e8705c; font-size:14px; text-align:center;
+  margin-top:14px; min-height:20px;
+}
+.note-cuisine{
+  font-size:12.5px; color:#8d8579; line-height:1.6;
+  background:#2c2924; border-radius:9px;
+  padding:12px 14px; margin-top:8px;
+}
+.note-cuisine code{ color:#d9cfbe; }
+
+/* ---------- Entete du tableau de bord ---------- */
+.entete-cuisine{
+  position:sticky; top:0; z-index:20;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px;
+  background:#1c1a17;
+  border-bottom:1px solid #3a352d;
+  padding:14px 18px;
+}
+.titre-cuisine{
+  font-family:var(--police-titre); font-size:22px;
+  vertical-align:middle;
+}
+.compteur-attente{
+  display:inline-block; min-width:30px;
+  margin-left:10px; padding:3px 10px;
+  background:var(--accent); color:#fff;
+  border-radius:999px;
+  font-size:15px; font-weight:bold; text-align:center;
+  vertical-align:middle;
+}
+.compteur-attente.zero{ background:#3a352d; color:#8d8579; }
+
+.actions-entete{ display:flex; align-items:center; gap:8px; }
+.btn-icone{
+  background:#2c2924; border:1px solid #3a352d;
+  color:#d9cfbe; border-radius:9px;
+  width:40px; height:40px; font-size:17px;
+  cursor:pointer; transition:.15s;
+}
+.btn-icone:hover{ background:#3a352d; }
+
+/* ---------- Bandeau des notifications ---------- */
+.bandeau-notif{
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:10px;
+  background:#3a3218; border-bottom:1px solid #5c5028;
+  color:#e8d9a8; font-size:13.5px;
+  padding:11px 18px;
+}
+.bandeau-notif button{
+  background:#e8d9a8; color:#3a3218;
+  border:none; border-radius:999px;
+  padding:6px 16px; font-size:13px; font-weight:600;
+  cursor:pointer;
+}
+
+/* ---------- La liste ---------- */
+.liste-commandes{
+  max-width:900px; margin:0 auto;
+  padding:18px;
+  display:grid; gap:14px;
+}
+.vide{
+  text-align:center; color:#6b645a;
+  padding:70px 20px; line-height:1.8;
+}
+.vide span{ font-size:13px; }
+
+/* ---------- Une carte de commande ---------- */
+.carte-commande{
+  background:#211f1b;
+  border:1px solid #3a352d;
+  border-radius:13px;
+  padding:16px 18px;
+  transition:border-color var(--temps) var(--courbe), background .4s var(--courbe);
+}
+/* Une commande a traiter se signale par sa bordure entiere et son
+   fond legerement chaud, pas par une bande sur le cote. */
+.carte-commande.statut-nouvelle{ border-color:var(--accent); background:#2a201d; }
+.carte-commande.statut-vue     { opacity:.55; }
+
+/* Passe dix minutes sans etre vue, la commande le signale :
+   le chiffre du temps d'attente vire au vermillon et respire. */
+.carte-commande.en-retard .heure-commande{
+  color:var(--accent); font-weight:600;
+  animation:respire 2.4s ease-in-out infinite;
+}
+@keyframes respire{ 0%,100%{ opacity:1 } 50%{ opacity:.45 } }
+
+/* Une pastille devant le numero rappelle l'etat en un coup d'oeil */
+.num-commande::before{
+  content:"";
+  display:inline-block; vertical-align:middle;
+  width:9px; height:9px; margin-right:9px;
+  border-radius:50%;
+  background:var(--valide);
+}
+.statut-nouvelle .num-commande::before{ background:var(--accent); }
+
+/* clignotement a l'arrivee */
+.carte-commande.surlignee{ animation:clignote 1s ease-in-out 3; }
+@keyframes clignote{
+  0%,100%{ background:#2a201d; }
+  50%    { background:#4a2a20; }
+}
+
+.entete-commande{
+  display:flex; justify-content:space-between; align-items:center;
+  gap:12px; margin-bottom:10px;
+}
+.num-commande{
+  font-family:"Courier New",monospace;
+  font-size:18px; font-weight:bold; letter-spacing:1px;
+  color:#f2ede4;
+}
+.heure-commande{ font-size:13px; color:#8d8579; margin-left:10px; }
+.etiquette-statut{
+  font-size:11.5px; text-transform:uppercase; letter-spacing:1px;
+  color:#8d8579; white-space:nowrap;
+}
+
+.client-commande{ font-size:15px; color:#d9cfbe; }
+.adresse-commande{ font-size:13.5px; color:#8d8579; margin-top:3px; }
+
+.detail-commande{
+  font-family:"Courier New",monospace;
+  font-size:15px; line-height:1.7; color:#f2ede4;
+  white-space:pre-wrap; word-break:break-word;
+  background:#191713;
+  border-radius:9px;
+  padding:14px 16px; margin:12px 0 14px;
+  overflow-x:auto;
+}
+
+/* ---------- Les trois boutons ---------- */
+.actions-commande{ display:flex; gap:8px; }
+.actions-commande button{
+  flex:1;
+  background:#2c2924; border:1px solid #3a352d;
+  color:#d9cfbe; border-radius:9px;
+  padding:12px 6px; font-family:inherit; font-size:14px;
+  cursor:pointer; transition:.15s;
+}
+.actions-commande button:hover{ background:#3a352d; }
+.actions-commande button.actif{
+  background:var(--valide); border-color:var(--valide); color:#fff; font-weight:600;
+}
+.actions-commande button:disabled{ cursor:default; }
+.actions-commande button.actif::before{ content:"✓  "; }
+
+@media (max-width:520px){
+  .liste-commandes{ padding:12px; }
+  .actions-commande{ flex-direction:column; }
+  .actions-commande button{ padding:14px; }
+  .titre-cuisine{ font-size:19px; }
+}
+
+/* Rappel du compte attendu sur l'ecran de connexion */
+.rappel-compte{
+  text-align:center; font-size:12.5px; color:#8d8579;
+  background:#2c2924; border-radius:999px;
+  padding:6px 14px; margin:0 auto 20px;
+  display:inline-block; width:100%;
+}
+
+/* Identifiant du chef avec le suffixe du domaine */
+.carte-cuisine .champ-suffixe{
+  background:#2c2924; border-color:#3a352d;
+}
+.carte-cuisine .champ-suffixe input{ color:#f2ede4; }
+.carte-cuisine .champ-suffixe span{
+  background:#211f1b; border-left-color:#3a352d; color:#8d8579;
+}
+
+/* Le compte connecte et le bouton de deconnexion, dans l'entete */
+.compte-cuisine{
+  font-size:13px; color:#8d8579;
+  margin-right:4px; white-space:nowrap;
+}
+.btn-quitter{
+  background:#2c2924; border:1px solid #3a352d;
+  color:#d9cfbe; border-radius:9px;
+  padding:0 16px; height:40px;
+  font-family:inherit; font-size:13.5px;
+  cursor:pointer; transition:.15s; white-space:nowrap;
+}
+.btn-quitter:hover{ background:var(--accent); border-color:var(--accent); color:#fff; }
+
+@media (max-width:600px){
+  .compte-cuisine{ display:none; }
+  .btn-quitter{ padding:0 12px; font-size:12.5px; }
+}

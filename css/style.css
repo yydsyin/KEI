@@ -1,1 +1,750 @@
+/* ============================================================
+   FEUILLE DE STYLE  --  Restaurant KEI
+   ============================================================ */
 
+/* ---------- 1. Variables de couleurs ---------- */
+:root{
+  --papier      : #f7f4ee;   /* fond general, couleur papier */
+  --papier-fonce: #efeae0;
+  --encre       : #1c1a17;   /* texte principal */
+  --encre-doux  : #6b645a;   /* texte secondaire */
+  --accent      : #b8412e;   /* rouge vermillon : titres, prix, boutons */
+  --accent-fonce: #93321f;
+  --valide      : #2f7d54;   /* vert sourd : un ETAT, jamais une action */
+  --bordure     : #e0d9cc;
+  --ombre       : 0 6px 22px -8px rgba(28,26,23,.28);
+  --rayon       : 14px;
+
+  /* Deux familles, deux roles. Le serif porte le nom du
+     restaurant et les titres ; le sans porte tout le reste. */
+  --police-titre : "Newsreader", Georgia, "Times New Roman", serif;
+  --police-texte : "Karla", "Helvetica Neue", Arial, sans-serif;
+
+  /* Une seule courbe de mouvement pour tout le site : depart
+     franc, arrivee douce. */
+  --temps  : .22s;
+  --courbe : cubic-bezier(.2, .8, .2, 1);
+}
+
+/* ---------- 2. Remise a zero ---------- */
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+/* Un element avec l'attribut hidden doit toujours disparaitre.
+   Sans cette regle, un "display:flex" ecrit plus bas dans le
+   fichier reprend le dessus et l'element reste visible. */
+[hidden]{ display:none !important; }
+
+/* Les parties qu'on ne dessine pas portent aussi le design :
+   selection, curseur de saisie, cases a cocher, ascenseurs. */
+::selection{ background:var(--accent); color:#fff; }
+:root{ accent-color:var(--accent); }
+input, textarea, select{ caret-color:var(--accent); }
+
+/* Un anneau de focus visible et coherent, pour la navigation
+   au clavier. :focus-visible ne s'affiche pas au clic souris. */
+a:focus-visible, button:focus-visible,
+input:focus-visible, select:focus-visible, textarea:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+  border-radius:6px;
+}
+
+body{
+  font-family:var(--police-texte);
+  background:var(--papier);
+  color:var(--encre);
+  line-height:1.6;
+  padding-bottom:90px;          /* place pour la barre du panier */
+}
+
+/* ---------- 3. En-tete ---------- */
+header{
+  background:var(--encre);
+  color:var(--papier);
+  text-align:center;
+  padding:55px 20px 45px;
+}
+header .logo{
+  font-family:var(--police-titre);
+  font-size:64px;
+  letter-spacing:14px;
+  margin-left:14px;             /* compense l'espacement de la derniere lettre */
+  color:var(--papier);
+}
+header .slogan{
+  color:#b9b1a4;
+  font-size:14px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-top:6px;
+}
+header .trait{
+  width:50px; height:2px;
+  background:var(--accent);
+  margin:22px auto 0;
+}
+
+/* ---------- 4. Barre des categories (collante) ---------- */
+nav{
+  position:sticky; top:0; z-index:50;
+  background:rgba(247,244,238,.95);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--bordure);
+  display:flex; gap:8px;
+  padding:12px 16px;
+  overflow-x:auto;              /* on peut faire defiler sur telephone */
+  scrollbar-width:none;
+}
+nav::-webkit-scrollbar{ display:none; }
+nav a{
+  flex:0 0 auto;
+  text-decoration:none;
+  color:var(--encre-doux);
+  font-size:14px;
+  padding:8px 16px;
+  border:1px solid var(--bordure);
+  border-radius:999px;
+  transition:all var(--temps) var(--courbe);
+  white-space:nowrap;
+}
+nav a:hover{ background:var(--encre); color:var(--papier); border-color:var(--encre); }
+
+/* ---------- 5. Contenu ---------- */
+main{ max-width:780px; margin:0 auto; padding:40px 18px; }
+
+.categorie{ margin-bottom:52px; }
+.categorie h2{
+  font-family:var(--police-titre);
+  font-size:30px;
+  font-weight:normal;
+  color:var(--accent);
+  padding-bottom:10px;
+  border-bottom:2px solid var(--bordure);
+  margin-bottom:22px;
+}
+
+/* ---------- 6. Une ligne de plat ---------- */
+.plat{
+  display:flex; align-items:center; gap:16px;
+  background:#fff;
+  border:1px solid var(--bordure);
+  border-radius:var(--rayon);
+  padding:16px 18px;
+  margin-bottom:12px;
+  transition:border-color var(--temps) var(--courbe);
+}
+.plat:hover{ border-color:var(--encre-doux); }
+.plat-infos{ flex:1; min-width:0; }
+.plat-nom{ font-size:17px; font-weight:600; }
+.plat-desc{ font-size:13.5px; color:var(--encre-doux); }
+.plat-prix{
+  font-family:var(--police-titre);
+  font-size:18px;
+  color:var(--accent);
+  white-space:nowrap;
+}
+
+/* ---------- 7. Boutons + / - ---------- */
+.compteur{ display:flex; align-items:center; gap:10px; }
+.compteur button{
+  width:40px; height:40px;
+  border:1px solid var(--bordure);
+  background:#fff; color:var(--encre);
+  border-radius:50%;
+  font-size:18px; line-height:1;
+  cursor:pointer;
+  transition:all var(--temps) var(--courbe);
+}
+.compteur button:hover{ background:var(--accent); color:#fff; border-color:var(--accent); }
+.compteur .qte{ min-width:18px; text-align:center; font-weight:600; }
+.compteur .moins[hidden], .compteur .qte[hidden]{ display:none; }
+
+/* ---------- 8. Barre du panier en bas ---------- */
+.barre-panier{
+  position:fixed; left:0; right:0; bottom:0; z-index:60;
+  background:var(--encre); color:var(--papier);
+  display:flex; align-items:center; justify-content:space-between;
+  gap:14px;
+  padding:14px 20px;
+  transform:translateY(110%);
+  transition:transform var(--temps) var(--courbe);
+}
+.barre-panier.visible{ transform:translateY(0); }
+.barre-panier .resume{ font-size:14px; }
+.barre-panier .resume strong{ font-size:19px; font-family:var(--police-titre); }
+.barre-panier button{
+  background:var(--accent); color:#fff;
+  border:none; border-radius:999px;
+  padding:12px 26px;
+  font-size:15px; font-weight:600;
+  cursor:pointer; transition:all var(--temps) var(--courbe);
+}
+.barre-panier button:hover{ background:var(--accent-fonce); }
+
+/* ---------- 9. Fenetre du panier (modale) ---------- */
+.voile{
+  position:fixed; inset:0; z-index:70;
+  background:rgba(28,26,23,.55);
+  display:none;
+  align-items:flex-end; justify-content:center;
+}
+.voile.ouvert{ display:flex; }
+
+.modale{
+  background:var(--papier);
+  width:100%; max-width:560px;
+  max-height:92vh; overflow-y:auto;
+  border-radius:20px 20px 0 0;
+  padding:26px 24px 30px;
+  animation:monte .3s var(--courbe);
+}
+@keyframes monte{ from{ transform:translateY(60px); opacity:0 } to{ transform:none; opacity:1 } }
+
+.modale h3{
+  font-family:var(--police-titre); font-size:24px; font-weight:normal;
+  margin-bottom:18px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.fermer{
+  background:none; border:none; font-size:28px;
+  color:var(--encre-doux); cursor:pointer; line-height:1;
+}
+
+/* lignes recapitulatives */
+.ligne-panier{
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  padding:11px 0; border-bottom:1px dashed var(--bordure);
+  font-size:15px;
+}
+.ligne-panier .sup{
+  background:none; border:none; color:var(--accent);
+  cursor:pointer; font-size:16px;
+}
+.total{
+  display:flex; justify-content:space-between;
+  font-family:var(--police-titre); font-size:22px;
+  margin:18px 0 24px;
+}
+
+/* ---------- 10. Formulaire ---------- */
+label{ display:block; font-size:13px; color:var(--encre-doux); margin:14px 0 5px; }
+::placeholder{ color:#8a8073; opacity:1; }
+
+input, select, textarea{
+  width:100%;
+  font-family:inherit; font-size:15px;
+  padding:11px 13px;
+  border:1px solid var(--bordure); border-radius:9px;
+  background:#fff; color:var(--encre);
+}
+input:focus, select:focus, textarea:focus{ outline:2px solid var(--accent); border-color:transparent; }
+textarea{ resize:vertical; min-height:66px; }
+
+.btn-envoyer{
+  position:sticky; bottom:0; z-index:2;
+  width:100%; margin-top:22px;
+  background:var(--accent); color:#fff;
+  border:none; border-radius:11px;
+  padding:16px; font-size:16px; font-weight:600;
+  cursor:pointer; transition:all var(--temps) var(--courbe);
+  display:flex; align-items:center; justify-content:center; gap:10px;
+}
+.btn-envoyer:hover{ background:var(--accent-fonce); }
+.note{ font-size:12px; color:var(--encre-doux); text-align:center; margin-top:12px; }
+
+/* ---------- 11. Pied de page ---------- */
+footer{
+  background:var(--papier-fonce);
+  border-top:1px solid var(--bordure);
+  text-align:center;
+  padding:36px 20px;
+  font-size:14px; color:var(--encre-doux);
+}
+footer .nom{ font-family:var(--police-titre); font-size:22px; color:var(--encre); letter-spacing:5px; }
+footer a{ color:var(--accent); }
+
+/* ---------- 12. Telephones ---------- */
+@media (max-width:520px){
+  /* La barre de compte reste sur une ligne : on retire le mot
+     "Bonjour" et on resserre les boutons. */
+  .barre-compte{ padding:8px 12px; gap:8px; }
+  .barre-compte .salut{ display:none; }
+  .barre-compte button{ padding:6px 11px; font-size:12px; }
+
+  header{ padding:40px 16px 34px; }
+  .compteur button{ width:44px; height:44px; }   /* le pouce, pas la souris */
+  .plat{ gap:10px; }
+  header .logo{ font-size:46px; letter-spacing:10px; }
+  .plat{ padding:14px; gap:12px; }
+  .plat-nom{ font-size:16px; }
+  .barre-panier{ padding:12px 14px; }
+  .barre-panier button{ padding:11px 20px; font-size:14px; }
+}
+
+/* ============================================================
+   13. AJOUTS : precisions par plat et ecran de confirmation
+   ============================================================ */
+
+/* ---------- Bloc d'un plat dans le panier ---------- */
+.bloc-panier{ padding:11px 0; border-bottom:1px dashed var(--bordure); }
+.bloc-panier .ligne-panier{ padding:0; border:none; }
+
+.champ-precision{
+  margin-top:8px;
+  font-size:13.5px;
+  padding:8px 11px;
+  background:var(--papier);
+  border:1px dashed var(--bordure);
+}
+.champ-precision::placeholder{ color:#8a8073; font-size:13px; }
+.champ-precision:focus{ background:#fff; }
+
+/* ---------- Ecran de confirmation ---------- */
+.confirm-coche{
+  width:62px; height:62px; margin:6px auto 16px;
+  border-radius:50%;
+  background:var(--valide); color:#fff;
+  font-size:32px; line-height:62px; text-align:center;
+}
+.confirm-titre{
+  font-family:var(--police-titre); font-size:25px; font-weight:normal;
+  text-align:center; display:block; margin-bottom:6px;
+}
+.confirm-texte{ text-align:center; color:var(--encre-doux); font-size:14px; }
+
+.numero-commande{
+  font-family:"Courier New", monospace;
+  font-size:26px; font-weight:bold; letter-spacing:2px;
+  text-align:center; color:var(--accent);
+  background:#fff; border:2px dashed var(--accent);
+  border-radius:12px;
+  padding:14px; margin:10px 0 24px;
+}
+
+/* les 3 etapes du suivi */
+.etapes-suivi{ margin-bottom:8px; }
+.etape{ display:flex; gap:13px; align-items:flex-start; margin-bottom:16px; }
+.etape .puce{
+  flex:0 0 26px; height:26px; line-height:26px; text-align:center;
+  border-radius:50%; font-size:13px; font-weight:bold;
+  background:var(--papier-fonce); color:var(--encre-doux);
+  border:1px solid var(--bordure);
+}
+.etape.faite .puce{ background:var(--valide); color:#fff; border-color:var(--valide); }
+.etape strong{ display:block; font-size:15px; }
+.etape span:not(.puce){ display:block; font-size:13.5px; color:var(--encre-doux); line-height:1.5; }
+
+.btn-secondaire{
+  width:100%; margin-top:10px;
+  background:none; color:var(--encre-doux);
+  border:1px solid var(--bordure); border-radius:11px;
+  padding:14px; font-size:15px; cursor:pointer;
+}
+.btn-secondaire:hover{ background:var(--papier-fonce); }
+
+/* ============================================================
+   14. ZONE "HORS MENU"
+   ============================================================ */
+.zone-hors-menu{ max-width:780px; margin:0 auto; padding:0 18px 50px; }
+
+.carte-hors-menu{
+  background:#fff;
+  border:2px dashed var(--accent);
+  border-radius:var(--rayon);
+  padding:26px 24px;
+  text-align:center;
+}
+.carte-hors-menu h2{
+  font-family:var(--police-titre); font-size:23px; font-weight:normal;
+  color:var(--accent); margin-bottom:8px;
+}
+.hm-intro{ font-size:14.5px; color:var(--encre-doux); margin-bottom:18px; }
+
+.form-hors-menu{ display:flex; gap:8px; }
+.form-hors-menu #hm-texte{ flex:1; }
+.form-hors-menu #hm-qte{ width:74px; text-align:center; }
+.form-hors-menu button{
+  flex:0 0 auto;
+  background:var(--accent); color:#fff;
+  border:none; border-radius:9px;
+  padding:0 22px; font-size:15px; font-weight:600;
+  cursor:pointer; transition:all var(--temps) var(--courbe);
+}
+.form-hors-menu button:hover{ background:var(--accent-fonce); }
+
+.hm-note{ font-size:12.5px; color:var(--encre-doux); margin-top:14px; }
+
+/* le bouton "Hors menu" dans la barre des categories */
+nav a.chip-hm{ border-color:var(--accent); color:var(--accent); }
+nav a.chip-hm:hover{ background:var(--accent); color:#fff; border-color:var(--accent); }
+
+/* une demande hors menu dans le panier */
+.bloc-panier.hors-menu .txt{ font-style:italic; }
+.a-confirmer{
+  font-size:12.5px; color:var(--encre-doux);
+  background:var(--papier-fonce);
+  border-radius:999px; padding:3px 10px;
+  white-space:nowrap;
+}
+.note-total-hm{
+  font-size:12.5px; color:var(--encre-doux);
+  text-align:right; margin:-16px 0 20px;
+}
+
+@media (max-width:520px){
+  .form-hors-menu{ flex-wrap:wrap; }
+  .form-hors-menu #hm-texte{ flex:1 0 100%; }
+  .form-hors-menu #hm-qte{ flex:0 0 74px; }
+  .form-hors-menu button{ flex:1; padding:12px; }
+}
+
+/* ============================================================
+   15. ECRAN DE CONNEXION DU CLIENT
+   ============================================================ */
+body.verrouille{ overflow:hidden; }
+
+.ecran-client{
+  position:fixed; inset:0; z-index:200;
+  background:var(--encre);
+  display:flex; align-items:center; justify-content:center;
+  padding:24px 18px;
+  overflow-y:auto;
+}
+
+.carte-client{
+  background:var(--papier);
+  width:100%; max-width:400px;
+  border-radius:18px;
+  padding:32px 28px 26px;
+  box-shadow:0 18px 50px rgba(0,0,0,.4);
+}
+
+.logo-client{
+  font-family:var(--police-titre);
+  font-size:40px; letter-spacing:9px; margin-left:9px;
+  text-align:center; color:var(--encre);
+}
+.sous-logo{
+  text-align:center; font-size:13px; color:var(--encre-doux);
+  letter-spacing:1px; margin-bottom:22px;
+}
+
+/* les deux onglets */
+.onglets{
+  display:flex; gap:6px;
+  background:var(--papier-fonce);
+  border-radius:999px; padding:4px;
+  margin-bottom:6px;
+}
+.onglets button{
+  flex:1;
+  background:none; border:none; border-radius:999px;
+  padding:9px 6px; font-family:inherit; font-size:14px;
+  color:var(--encre-doux); cursor:pointer; transition:all var(--temps) var(--courbe);
+}
+.onglets button.actif{ background:#fff; color:var(--encre); font-weight:600; box-shadow:0 1px 4px rgba(0,0,0,.08); }
+
+.btn-client{
+  width:100%; margin-top:22px;
+  background:var(--accent); color:#fff;
+  border:none; border-radius:11px;
+  padding:15px; font-size:15px; font-weight:600;
+  cursor:pointer; transition:all var(--temps) var(--courbe);
+}
+.btn-client:hover{ background:var(--accent-fonce); }
+
+.erreur-client{
+  color:var(--accent); font-size:13.5px;
+  text-align:center; margin-top:14px; min-height:19px;
+}
+.note-client{
+  font-size:12px; color:var(--encre-doux);
+  text-align:center; line-height:1.5;
+  border-top:1px solid var(--bordure); padding-top:14px; margin-top:8px;
+}
+
+/* ---------- Bandeau du client connecte ---------- */
+.barre-compte{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px;
+  background:var(--encre); color:#b9b1a4;
+  font-size:13px;
+  padding:9px 20px;
+}
+.barre-compte strong{ color:var(--papier); }
+.barre-compte button{
+  background:none; border:1px solid #4a453e;
+  color:#b9b1a4; border-radius:999px;
+  padding:6px 14px; font-size:12.5px; white-space:nowrap;
+  font-family:inherit; cursor:pointer;
+  transition:border-color var(--temps) var(--courbe),
+             color        var(--temps) var(--courbe);
+}
+.barre-compte button:hover{ border-color:var(--papier); color:var(--papier); }
+
+/* ============================================================
+   16. SUIVI EN DIRECT DE LA COMMANDE
+   La cuisine clique sur Vue / En preparation / Prete, et cette
+   ligne change toute seule sur l'ecran du client.
+   ============================================================ */
+.suivi-direct{
+  display:flex; align-items:center; gap:13px;
+  border-radius:12px;
+  padding:14px 16px; margin-bottom:18px;
+  background:var(--papier-fonce);
+  border:1px solid var(--bordure);
+  transition:background .3s, border-color .3s;
+}
+.suivi-direct strong{ display:block; font-size:15px; }
+.suivi-direct span{ display:block; font-size:12.5px; color:var(--encre-doux); }
+
+.suivi-direct .pastille{
+  flex:0 0 14px; width:14px; height:14px;
+  border-radius:50%;
+  background:var(--encre-doux);
+  color:#fff; font-size:11px; line-height:14px; text-align:center;
+}
+
+.suivi-direct.etat-nouvelle .pastille{
+  background:var(--accent);
+  animation:pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse{ 0%,100%{ opacity:1 } 50%{ opacity:.3 } }
+
+.suivi-direct.etat-vue{ background:#eef5f0; border-color:#cfe0d5; }
+.suivi-direct.etat-vue .pastille{
+  flex-basis:20px; width:20px; height:20px; line-height:20px;
+  background:var(--valide); font-size:13px;
+}
+
+/* Texte d'aide sous le numero de commande */
+.confirm-aide{
+  font-size:13px; color:var(--encre-doux);
+  line-height:1.6; text-align:center;
+  margin-bottom:20px;
+}
+
+/* ============================================================
+   17. MES COMMANDES DU JOUR
+   ============================================================ */
+.historique{
+  background:#eef5f0;
+  border-bottom:1px solid #cfe0d5;
+  padding:16px 18px;
+}
+.historique h2{
+  max-width:780px; margin:0 auto 10px;
+  font-size:12.5px; font-weight:600;
+  text-transform:uppercase; letter-spacing:1.5px;
+  color:#245f3f;
+}
+.historique ul{ max-width:780px; margin:0 auto; list-style:none; }
+
+.historique li{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; flex-wrap:wrap;
+  background:#fff;
+  border:1px solid #cfe0d5;
+  border-radius:10px;
+  padding:12px 14px; margin-bottom:8px;
+  cursor:pointer;
+  transition:border-color var(--temps) var(--courbe);
+}
+.historique li:last-child{ margin-bottom:0; }
+.historique li:hover{ border-color:var(--valide); }
+
+/* L'etat se lit a la pastille et a la couleur du texte,
+   pas a une bande coloree sur le cote. */
+.hist-gauche{ display:flex; align-items:center; gap:10px; }
+.hist-gauche::before{
+  content:"";
+  width:8px; height:8px; flex:0 0 8px;
+  border-radius:50%;
+  background:var(--valide);
+}
+.historique li.hist-nouvelle .hist-gauche::before{
+  background:var(--accent);
+  animation:pulse 1.6s ease-in-out infinite;
+}
+.historique li.hist-nouvelle .hist-statut{ color:var(--accent); }
+.hist-num{
+  font-family:"Courier New",monospace;
+  font-size:14px; font-weight:bold; letter-spacing:1px;
+  color:var(--encre);
+}
+.hist-heure{ font-size:12.5px; color:var(--encre-doux); }
+
+.hist-droite{ display:flex; align-items:center; gap:14px; }
+.hist-total{ font-family:var(--police-titre); font-size:15px; color:var(--encre); }
+.hist-statut{
+  font-size:11.5px; text-transform:uppercase; letter-spacing:.8px;
+  color:#245f3f; white-space:nowrap;
+}
+
+@media (max-width:520px){
+  .historique li{ padding:10px 12px; }
+  .hist-droite{ width:100%; justify-content:space-between; gap:8px; }
+}
+
+/* ============================================================
+   18. IDENTIFIANT AVEC SUFFIXE AUTOMATIQUE
+   ============================================================ */
+.champ-suffixe{
+  display:flex; align-items:stretch;
+  border:1px solid var(--bordure); border-radius:9px;
+  background:#fff; overflow:hidden;
+}
+.champ-suffixe input{
+  flex:1; border:none; border-radius:0; background:none;
+}
+.champ-suffixe input:focus{ outline:none; }
+.champ-suffixe:focus-within{ outline:2px solid var(--accent); border-color:transparent; }
+.champ-suffixe span{
+  display:flex; align-items:center;
+  padding:0 13px;
+  background:var(--papier-fonce);
+  border-left:1px solid var(--bordure);
+  font-size:14px; color:var(--encre-doux);
+  white-space:nowrap;
+}
+
+/* ============================================================
+   19. MES INFORMATIONS
+   ============================================================ */
+.barre-compte .actions-compte{ display:flex; gap:8px; }
+
+.mi-compte{
+  background:var(--papier-fonce);
+  border-radius:10px; padding:12px 14px;
+  font-size:14px; margin-bottom:6px;
+}
+.mi-compte span{ font-size:12.5px; color:var(--encre-doux); }
+
+.mi-titre{
+  font-family:var(--police-titre); font-weight:normal; font-size:19px;
+  color:var(--accent); margin:22px 0 4px;
+}
+.mi-trait{ border:none; border-top:1px solid var(--bordure); margin:28px 0 0; }
+
+.message-info{
+  font-size:13px; text-align:center;
+  margin-top:12px; min-height:18px;
+}
+.message-info.erreur{ color:var(--accent); }
+.message-info.succes{ color:#245f3f; }
+
+/* ============================================================
+   20. PAGE DE CONNEXION UNIQUE
+   ============================================================ */
+.page-connexion{ background:var(--encre); padding-bottom:0; }
+
+.ecran-connexion{
+  min-height:100vh;
+  display:flex; align-items:center; justify-content:center;
+  padding:24px 18px;
+}
+.carte-connexion{
+  background:var(--papier);
+  width:100%; max-width:430px;
+  border-radius:18px;
+  padding:32px 28px 26px;
+  box-shadow:0 18px 50px rgba(0,0,0,.4);
+}
+.logo-connexion{
+  font-family:var(--police-titre);
+  font-size:44px; letter-spacing:10px; margin-left:10px;
+  text-align:center; color:var(--encre);
+}
+.sous-connexion{
+  text-align:center; font-size:13px; color:var(--encre-doux);
+  letter-spacing:2px; text-transform:uppercase;
+  margin-bottom:24px;
+}
+
+.question-porte{
+  font-size:13px; color:var(--encre-doux);
+  margin-bottom:9px;
+}
+
+/* les deux portes */
+.portes{ display:flex; gap:10px; margin-bottom:8px; }
+.porte{
+  flex:1;
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+  background:#fff;
+  border:1px solid var(--bordure); border-radius:13px;
+  padding:16px 12px;
+  font-family:inherit; cursor:pointer; text-align:center;
+  color:var(--encre-doux);
+  transition:border-color var(--temps) var(--courbe),
+             background   var(--temps) var(--courbe),
+             color        var(--temps) var(--courbe);
+}
+.porte:hover{ border-color:var(--encre-doux); }
+.porte.actif{ border-color:var(--accent); background:#fdf3f1; color:var(--accent); }
+
+.porte-icone{ width:24px; height:24px; flex:0 0 24px; }
+.porte-titre{ font-size:15px; font-weight:600; color:var(--encre); }
+.porte-desc{ font-size:12px; line-height:1.4; }
+.porte.actif .porte-titre{ color:var(--accent); }
+
+.erreur-connexion{
+  color:var(--accent); font-size:13.5px;
+  text-align:center; margin-top:14px; min-height:19px;
+}
+
+/* deja connecte */
+.bloc-deja{
+  background:var(--papier-fonce);
+  border-radius:11px; padding:14px;
+  font-size:14.5px; text-align:center;
+  margin-bottom:16px;
+}
+.porte-directe{ margin-top:0 !important; margin-bottom:9px; }
+#portes-disponibles{ margin-bottom:16px; }
+
+@media (max-width:420px){
+  .portes{ flex-direction:column; }
+
+  /* Une grille plutot qu'une rangee : l'icone occupe sa colonne,
+     le titre et la description s'empilent proprement a cote. */
+  .porte{
+    display:grid;
+    grid-template-columns:24px 1fr;
+    grid-template-areas:"icone titre" "icone desc";
+    align-items:center; gap:2px 12px;
+    text-align:left; padding:14px 16px;
+  }
+  .porte-icone{ grid-area:icone; }
+  .porte-titre{ grid-area:titre; align-self:end; }
+  .porte-desc { grid-area:desc;  align-self:start; }
+}
+
+/* ============================================================
+   21. MENU VIDE ET BOUTON "RECOMMANDER"
+   ============================================================ */
+.menu-vide{
+  text-align:center; color:var(--encre-doux);
+  padding:60px 20px; line-height:1.9;
+}
+.menu-vide span{ font-size:13.5px; }
+
+.hist-refaire{
+  background:none;
+  border:1px solid #cfe0d5;
+  color:#245f3f;
+  border-radius:999px;
+  padding:5px 13px;
+  font-family:inherit; font-size:12px; white-space:nowrap;
+  cursor:pointer;
+  transition:background var(--temps) var(--courbe),
+             color      var(--temps) var(--courbe);
+}
+.hist-refaire:hover{ background:var(--valide); color:#fff; border-color:var(--valide); }
+
+/* Sur telephone, le bouton "Recommander" doit se viser au pouce.
+   Cette regle vient APRES la regle de base : dans une feuille de
+   style, a poids egal, c'est la derniere qui gagne. */
+@media (max-width:520px){
+  .hist-refaire{ padding:9px 16px; font-size:13px; }
+}
