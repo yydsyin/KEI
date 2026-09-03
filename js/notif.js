@@ -66,7 +66,19 @@ function prevenirLeChef(commande){
     "Priority" : String(NTFY.priorite),
     "Tags"     : "bell"
   };
-  if (lienCuisine.indexOf("http") === 0) enTetes["Click"] = lienCuisine;
+  if (lienCuisine.indexOf("http") === 0) {
+    /* Appuyer n'importe ou sur la notification ouvre la cuisine. */
+    enTetes["Click"] = lienCuisine;
+
+    /* Et un vrai bouton, sous le texte de la notification.
+       Le "clear=true" est l'essentiel : il FERME la notification
+       en meme temps qu'il ouvre l'ecran cuisine. Sans lui, si le
+       chef a choisi "Conserver les notifications" dans ntfy, le
+       telephone continue de sonner jusqu'a ce qu'on aille la
+       balayer a la main.
+       Format impose par ntfy :  action, libelle, parametres... */
+    enTetes["Actions"] = "view, Ouvrir la cuisine, " + lienCuisine + ", clear=true";
+  }
 
   const envois = [ envoyerNtfy(enTetes, resume) ];
 
