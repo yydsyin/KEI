@@ -703,6 +703,11 @@ async function envoyerCommande(){
      On n'attend pas la reponse : la commande est deja enregistree. */
   prevenirLeChef({ numero: numero, mode: mode });
 
+  /* Puis on continue de sonner toutes les 30 secondes tant que la
+     cuisine n'a pas appuye sur "Marquer comme vue". C'est
+     afficherStatut(), plus bas, qui coupe les rappels. */
+  demarrerRappels({ numero: numero, mode: mode });
+
   /* on l'ajoute a "mes commandes du jour", avec son contenu :
      c'est ce qui permet de la refaire d'un seul geste. */
   ajouterAHistorique({
@@ -749,6 +754,12 @@ function afficherStatut(statut){
   const zone     = document.getElementById("suivi-direct");
   const pastille = document.getElementById("pastille-statut");
   const texte    = document.getElementById("texte-statut");
+
+  /* La cuisine a appuye sur "Marquer comme vue" : on arrete
+     immediatement de faire sonner son telephone. C'est tout
+     l'interet de suivre le statut en direct. */
+  if (statut === "vue" && typeof arreterRappels === "function") arreterRappels();
+
   if (!zone) return;
 
   const libelles = {
