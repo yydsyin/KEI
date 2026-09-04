@@ -175,7 +175,7 @@
   <!-- ====== CHARGEMENT / ACCES REFUSE ====== -->
   <div class="boite" id="ecran-attente">
     <h1>Espace restaurant</h1>
-    <p class="sous" id="message-attente">Verification du compte&hellip;</p>
+    <p class="sous" id="message-attente">Vérification du compte&hellip;</p>
     <p style="text-align:center;margin-top:16px"><a href="connexion.html">&larr; Page de connexion</a></p>
   </div>
 
@@ -186,24 +186,24 @@
       <h1 style="font-family:var(--police-titre);font-weight:normal;font-size:28px">Espace restaurant</h1>
       <div style="display:flex;align-items:center;gap:14px">
         <span style="font-size:13.5px;color:var(--encre-doux)" id="admin-connecte"></span>
-        <button class="btn petit secondaire" id="btn-deconnexion">Se deconnecter</button>
+        <button class="btn petit secondaire" id="btn-deconnexion">Se déconnecter</button>
       </div>
     </div>
 
     <div class="info">
-      <strong>A savoir :</strong> les modifications sont enregistrees dans <em>ce navigateur</em>.
+      <strong>À savoir :</strong> les modifications sont enregistrées dans <em>ce navigateur</em>.
       Pour qu'elles apparaissent pour tous les clients, cliquez sur
-      <strong>Telecharger menu.js</strong> puis remplacez le fichier <code>js/menu.js</code> sur GitHub.
+      <strong>Télécharger menu.js</strong> puis remplacez le fichier <code>js/menu.js</code> sur GitHub.
     </div>
 
     <div id="zone-categories"></div>
 
-    <button class="btn petit secondaire" id="btn-ajout-categorie">+ Ajouter une categorie</button>
+    <button class="btn petit secondaire" id="btn-ajout-categorie">+ Ajouter une catégorie</button>
 
     <hr style="margin:28px 0;border:none;border-top:1px solid var(--bordure)">
 
     <button class="btn" id="btn-enregistrer">Enregistrer les modifications</button>
-    <button class="btn secondaire" id="btn-telecharger">Telecharger menu.js (pour GitHub)</button>
+    <button class="btn secondaire" id="btn-telecharger">Télécharger menu.js (pour GitHub)</button>
     <button class="btn secondaire" id="btn-reinitialiser"
             style="background:none;color:var(--encre-doux);border:1px solid var(--bordure)">
       Revenir au menu d'origine
@@ -215,24 +215,24 @@
     <details class="bloc-outil">
       <summary><h2>Comptes clients</h2></summary>
       <p class="explication-outil">
-        Les comptes des clients sont geres par <strong>Firebase</strong>, pas
-        par cette page. Pour en creer un :
+        Les comptes des clients sont gérés par <strong>Firebase</strong>, pas
+        par cette page. Pour en créer un :
       </p>
       <ol class="explication-outil" style="margin:12px 0 0 20px">
         <li>console.firebase.google.com &rarr; votre projet</li>
         <li>Authentication &rarr; Users &rarr; <strong>Add user</strong></li>
         <li>Email : <code>identifiant@kei.mg</code> (ex. <code>mialy@kei.mg</code>)</li>
-        <li>Mot de passe : au moins 6 caracteres</li>
+        <li>Mot de passe : au moins 6 caractères</li>
       </ol>
       <p class="explication-outil" style="margin-top:12px">
         Le client se connecte ensuite en tapant seulement
         <code>mialy</code> : le site ajoute <code>@kei.mg</code> tout seul.
-        Il pourra changer son mot de passe et ses coordonnees lui-meme,
+        Il pourra changer son mot de passe et ses coordonnées lui-même,
         depuis <strong>Mes informations</strong>.
       </p>
       <p class="avert-outil">
         Pour supprimer un client, c'est au meme endroit dans la console
-        Firebase. Un compte supprime ne peut plus se connecter, immediatement.
+        Firebase. Un compte supprimé ne peut plus se connecter, immédiatement.
       </p>
     </details>
 
@@ -252,7 +252,7 @@
             ajouter <code>UID : "admin"</code></li>
       </ol>
       <p class="avert-outil">
-        Sans l'entree dans <code>roles</code>, le compte existe mais reste un
+        Sans l'entrée dans <code>roles</code>, le compte existe mais reste un
         client ordinaire : il ne pourra pas ouvrir cette page.
       </p>
     </details>
@@ -261,7 +261,7 @@
     <p style="text-align:center;margin-top:20px">
       <a href="index.html">&larr; Voir le site</a>
       &nbsp;&nbsp;&middot;&nbsp;&nbsp;
-      <a href="cuisine.html">Ecran cuisine &rarr;</a>
+      <a href="cuisine.html">Écran cuisine &rarr;</a>
     </p>
   </div>
 

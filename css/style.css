@@ -197,6 +197,12 @@ main{ max-width:780px; margin:0 auto; padding:40px 18px; }
   border-radius:20px 20px 0 0;
   padding:26px 24px 30px;
   animation:monte .3s var(--courbe);
+
+  /* Le bouton d'envoi est colle en bas de la fenetre. Sans cette
+     reserve, le navigateur amene un champ juste DERRIERE lui quand
+     on le selectionne : on ne voit plus ce qu'on tape, et un doigt
+     qui vise "Heure souhaitee" appuie sur "Envoyer". */
+  scroll-padding-bottom:104px;
 }
 @keyframes monte{ from{ transform:translateY(60px); opacity:0 } to{ transform:none; opacity:1 } }
 

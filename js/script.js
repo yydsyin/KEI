@@ -456,7 +456,7 @@ function rafraichirAffichage(){
     const champ = document.createElement("input");
     champ.type        = "text";
     champ.className   = "champ-precision";
-    champ.placeholder = "Precisions : sans oignon, bien cuit, peu de piment...";
+    champ.placeholder = "Précisions : sans oignon, bien cuit, peu de piment...";
     champ.value       = precisions[id] || "";
     champ.oninput     = function(){
       if (this.value.trim() === "") delete precisions[id];
@@ -487,7 +487,7 @@ function rafraichirAffichage(){
     const champ = document.createElement("input");
     champ.type        = "text";
     champ.className   = "champ-precision";
-    champ.placeholder = "Precisions sur cette demande...";
+    champ.placeholder = "Précisions sur cette demande...";
     champ.value       = demande.precision || "";
     champ.oninput     = function(){ horsMenu[i].precision = this.value; };
     bloc.appendChild(champ);
@@ -601,7 +601,7 @@ async function envoyerCommande(){
 
   const telephone = document.getElementById("telephone").value.trim();
   if (telephone === "") {
-    alert("Merci d'indiquer votre numero de telephone, pour que le restaurant puisse vous rappeler.");
+    alert("Merci d'indiquer votre numéro de téléphone, pour que le restaurant puisse vous rappeler.");
     document.getElementById("telephone").focus();
     return;
   }
@@ -755,7 +755,7 @@ function afficherStatut(statut){
   if (!zone) return;
 
   const libelles = {
-    nouvelle : "Commande recue, en attente de la cuisine",
+    nouvelle : "Commande reçue, en attente de la cuisine",
     vue      : "La cuisine a vu votre commande"
   };
 

@@ -17,7 +17,7 @@
     <span><span class="salut">Bonjour </span><strong id="compte-nom"></strong></span>
     <span class="actions-compte">
       <button id="btn-mes-infos">Mes informations</button>
-      <button id="btn-deconnexion-client">Se deconnecter</button>
+      <button id="btn-deconnexion-client">Se déconnecter</button>
     </span>
   </div>
 
@@ -35,16 +35,16 @@
         <span>L'identifiant ne peut pas etre change. Demandez au restaurant.</span>
       </p>
 
-      <h4 class="mi-titre">Mes coordonnees</h4>
+      <h4 class="mi-titre">Mes coordonnées</h4>
 
       <label for="mi-nom">Nom complet *</label>
       <input type="text" id="mi-nom" placeholder="Ex : Hery Rakoto">
 
-      <label for="mi-telephone">Numero de telephone</label>
+      <label for="mi-telephone">Numéro de téléphone</label>
       <input type="tel" id="mi-telephone" placeholder="Ex : 034 12 345 67">
 
       <label for="mi-adresse">Adresse de livraison habituelle</label>
-      <input type="text" id="mi-adresse" placeholder="Quartier, rue, point de repere">
+      <input type="text" id="mi-adresse" placeholder="Quartier, rue, point de repère">
 
       <button class="btn-envoyer" id="btn-enregistrer-infos">Enregistrer</button>
       <p class="message-info" id="mi-message-profil"></p>
@@ -56,10 +56,10 @@
       <label for="mi-ancien">Mot de passe actuel</label>
       <input type="password" id="mi-ancien" autocomplete="current-password">
 
-      <label for="mi-nouveau">Nouveau mot de passe (6 caracteres minimum)</label>
+      <label for="mi-nouveau">Nouveau mot de passe (6 caractères minimum)</label>
       <input type="password" id="mi-nouveau" autocomplete="new-password">
 
-      <label for="mi-nouveau2">Repetez le nouveau mot de passe</label>
+      <label for="mi-nouveau2">Répétez le nouveau mot de passe</label>
       <input type="password" id="mi-nouveau2" autocomplete="new-password">
 
       <button class="btn-secondaire" id="btn-changer-mdp">Changer le mot de passe</button>
@@ -92,20 +92,20 @@
     <div class="carte-hors-menu">
       <h2>Une envie qui n'est pas au menu ?</h2>
       <p class="hm-intro">
-        Ecrivez ce que vous souhaitez : la cuisine vous dira si elle peut
-        le preparer, et a quel prix.
+        Écrivez ce que vous souhaitez : la cuisine vous dira si elle peut
+        le préparer, et à quel prix.
       </p>
 
       <div class="form-hors-menu">
         <input type="text" id="hm-texte"
-               placeholder="Ex : mine sao aux legumes, gateau d'anniversaire...">
-        <input type="number" id="hm-qte" min="1" value="1" aria-label="Quantite">
+               placeholder="Ex : mine sao aux légumes, gâteau d'anniversaire...">
+        <input type="number" id="hm-qte" min="1" value="1" aria-label="Quantité">
         <button id="hm-ajouter">Ajouter</button>
       </div>
 
       <p class="hm-note">
         Ces demandes apparaissent dans la commande avec la mention
-        <strong>prix a confirmer</strong> : elles ne sont pas comptees dans le total.
+        <strong>prix à confirmer</strong> : elles ne sont pas comptées dans le total.
       </p>
     </div>
   </section>
@@ -157,32 +157,32 @@
         <label for="mode">Type de commande *</label>
         <select id="mode">
           <option value="Sur place">Sur place</option>
-          <option value="A emporter">A emporter</option>
+          <option value="A emporter">À emporter</option>
           <option value="Livraison">Livraison</option>
         </select>
 
         <!-- Ce bloc n'apparait que si "Livraison" est choisi -->
         <div id="bloc-adresse" hidden>
           <label for="adresse">Adresse de livraison *</label>
-          <input type="text" id="adresse" placeholder="Quartier, rue, point de repere">
+          <input type="text" id="adresse" placeholder="Quartier, rue, point de repère">
         </div>
 
-        <label for="telephone">Votre numero de telephone *</label>
+        <label for="telephone">Votre numéro de téléphone *</label>
         <input type="tel" id="telephone" placeholder="Ex : 034 12 345 67">
 
-        <label for="heure">Heure souhaitee</label>
+        <label for="heure">Heure souhaitée</label>
         <input type="text" id="heure" placeholder="Ex : 19h30 (ou laissez vide)">
 
-        <label for="remarque">Remarque generale sur la commande</label>
+        <label for="remarque">Remarque générale sur la commande</label>
         <textarea id="remarque" placeholder="Facultatif"></textarea>
 
         <button class="btn-envoyer" id="btn-envoyer">
-          Envoyer la commande a la cuisine
+          Envoyer la commande à la cuisine
         </button>
 
         <p class="note" id="note-envoi">
-          La commande part directement sur l'ecran de la cuisine.<br>
-          Vous suivrez sa preparation depuis cette page.
+          La commande part directement sur l'écran de la cuisine.<br>
+          Vous suivrez sa préparation depuis cette page.
         </p>
 
       </div>
@@ -191,9 +191,9 @@
       <div id="etape-confirmation" hidden>
 
         <div class="confirm-coche">&#10003;</div>
-        <h3 class="confirm-titre">Commande envoyee</h3>
+        <h3 class="confirm-titre">Commande envoyée</h3>
 
-        <p class="confirm-texte">Votre numero de commande :</p>
+        <p class="confirm-texte">Votre numéro de commande :</p>
         <div class="numero-commande" id="numero-commande">KEI-0000-000</div>
 
         <!-- Suivi en direct : se met a jour quand la cuisine clique -->
@@ -201,14 +201,14 @@
           <div class="pastille" id="pastille-statut"></div>
           <div>
             <strong id="texte-statut">En attente de la cuisine</strong>
-            <span>Cette ligne se met a jour toute seule.</span>
+            <span>Cette ligne se met à jour toute seule.</span>
           </div>
         </div>
 
         <p class="confirm-aide">
-          Gardez ce numero : la cuisine s'en sert pour retrouver votre commande.
+          Gardez ce numéro : la cuisine s'en sert pour retrouver votre commande.
           Vous pouvez fermer la page, le suivi reprendra a votre retour.
-          La commande est effacee de nos serveurs au bout de quelques heures.
+          La commande est effacée de nos serveurs au bout de quelques heures.
         </p>
 
         <button class="btn-secondaire" id="btn-nouvelle-commande">Passer une nouvelle commande</button>

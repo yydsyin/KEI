@@ -21,6 +21,16 @@
 
 let porteChoisie = "client";
 
+/* Vrai pendant qu'on traite le formulaire.
+
+   Firebase previent le site a chaque changement de session, y
+   compris juste apres une connexion reussie. Sans ce drapeau, on
+   afficherait l'ecran "vous etes deja connectee" en plein milieu
+   de la connexion, juste avant de rediriger : un ecran inutile,
+   et cliquable, qui n'a de sens que si la session existait deja
+   en arrivant sur la page. */
+let connexionEnCours = false;
+
 /* La porte a laquelle un compte appartient, d'apres sa page. */
 function porteDeLaPage(page){
   return page === "index.html" ? "client" : "interne";
@@ -28,7 +38,7 @@ function porteDeLaPage(page){
 
 /* Le nom du bouton qui mene a cette page. */
 function titreDeLaPage(page){
-  if (page === "cuisine.html") return "Ecran cuisine";
+  if (page === "cuisine.html") return "Écran cuisine";
   if (page === "admin.html")   return "Gerer le menu";
   return "Commander";
 }
@@ -61,6 +71,10 @@ async function allerAuBonEndroit(){
   erreur(porteChoisie === "client"
     ? "Ce compte est un compte interne : il ne sert pas a commander."
     : "Ce compte est un compte client : il n'a pas d'acces a l'espace interne.");
+
+  /* la connexion est terminee : l'ecran ci-dessous est desormais
+     legitime, c'est lui qui montre la porte qui lui revient */
+  connexionEnCours = false;
   afficherDejaConnecte();
 }
 
@@ -127,11 +141,13 @@ document.addEventListener("DOMContentLoaded", function(){
     if (id === "" || mdp === "") { erreur("Remplissez les deux champs."); return; }
 
     bouton.disabled = true;
+    connexionEnCours = true;
     erreur("");
 
     const r = await connecterCompte(id, mdp);
 
     if (!r.ok) {
+      connexionEnCours = false;
       bouton.disabled = false;
       erreur(r.erreur);
       document.getElementById("motdepasse").value = "";
@@ -151,8 +167,11 @@ document.addEventListener("DOMContentLoaded", function(){
     deconnecterCompte().then(function(){ location.reload(); });
   };
 
-  /* deja connecte ? on propose directement les portes ouvertes */
+  /* Deja connecte EN ARRIVANT sur la page ? On lui montre sa porte
+     plutot que de lui redemander un mot de passe qu'il vient peut-
+     etre de taper. Pendant une connexion en cours, on ne montre
+     rien : la redirection s'en charge. */
   surConnexion(function(utilisateur){
-    if (utilisateur) afficherDejaConnecte();
+    if (utilisateur && !connexionEnCours) afficherDejaConnecte();
   });
 });

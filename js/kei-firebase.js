@@ -20,7 +20,7 @@
 
 /* Les deux etats possibles d'une commande */
 const STATUTS = {
-  nouvelle : "A traiter",
+  nouvelle : "À traiter",
   vue      : "Vue par la cuisine"
 };
 
@@ -77,13 +77,13 @@ function identifiantCourt(adresse){
 function messageErreurAuth(code){
   switch (code) {
     case "auth/invalid-email"          : return "Identifiant invalide.";
-    case "auth/user-disabled"          : return "Ce compte a ete desactive.";
+    case "auth/user-disabled"          : return "Ce compte a été désactivé.";
     case "auth/user-not-found"         :
     case "auth/wrong-password"         :
     case "auth/invalid-credential"     : return "Identifiant ou mot de passe incorrect.";
-    case "auth/too-many-requests"      : return "Trop d'essais. Reessayez dans quelques minutes.";
+    case "auth/too-many-requests"      : return "Trop d'essais. Réessayez dans quelques minutes.";
     case "auth/network-request-failed" : return "Pas de connexion internet.";
-    case "auth/weak-password"          : return "Mot de passe trop court (6 caracteres minimum).";
+    case "auth/weak-password"          : return "Mot de passe trop court (6 caractères minimum).";
     case "auth/requires-recent-login"  : return "Reconnectez-vous avant de changer votre mot de passe.";
     default                            : return "Connexion impossible.";
   }
@@ -123,9 +123,9 @@ function utilisateurActuel(){
    ------------------------------------------------------------ */
 function changerMotDePasse(ancien, nouveau){
   const u = utilisateurActuel();
-  if (!u) return Promise.resolve({ ok:false, erreur:"Vous n'etes pas connectee." });
+  if (!u) return Promise.resolve({ ok:false, erreur:"Vous n'êtes pas connectée." });
   if (String(nouveau).length < 6) {
-    return Promise.resolve({ ok:false, erreur:"Le nouveau mot de passe doit faire 6 caracteres minimum." });
+    return Promise.resolve({ ok:false, erreur:"Le nouveau mot de passe doit faire 6 caractères minimum." });
   }
 
   const preuve = firebase.auth.EmailAuthProvider.credential(u.email, ancien);

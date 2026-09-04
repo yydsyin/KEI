@@ -412,9 +412,9 @@ function commandeRetiree(id){
 
 /* Se deconnecter, depuis le tableau de bord ou l'ecran d'attente */
 function deconnexionCuisine(){
-  const question = "Se deconnecter ?" + SAUT_LIGNE + SAUT_LIGNE +
-                   "Les commandes n'arriveront plus sur cet ecran, " +
-                   "et le telephone ne sonnera plus tant que personne " +
+  const question = "Se déconnecter ?" + SAUT_LIGNE + SAUT_LIGNE +
+                   "Les commandes n'arriveront plus sur cet écran, " +
+                   "et le téléphone ne sonnera plus tant que personne " +
                    "ne se reconnecte.";
   if (!confirm(question)) return;
   deconnecterCompte().then(function(){ location.href = "connexion.html"; });
