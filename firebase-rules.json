@@ -21,6 +21,42 @@
       }
     },
 
+    "historiques": {
+      "$uid": {
+        ".read":  "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+
+        "$commande": {
+          ".validate": "newData.hasChildren(['numero','date'])",
+
+          "numero"    : { ".validate": "newData.isString() && newData.val().length <= 40" },
+          "date"      : { ".validate": "newData.isString() && newData.val().length <= 40" },
+          "total"     : { ".validate": "newData.isNumber() && newData.val() >= 0" },
+          "idEnLigne" : { ".validate": "newData.isString() && newData.val().length <= 60" },
+
+          "lignes": {
+            "$i": {
+              "ligne"     : { ".validate": "newData.isString() && newData.val().length <= 120" },
+              "quantite"  : { ".validate": "newData.isNumber() && newData.val() > 0" },
+              "precision" : { ".validate": "newData.isString() && newData.val().length <= 300" },
+              "$autre"    : { ".validate": false }
+            }
+          },
+
+          "horsMenu": {
+            "$i": {
+              "texte"     : { ".validate": "newData.isString() && newData.val().length <= 200" },
+              "quantite"  : { ".validate": "newData.isNumber() && newData.val() > 0" },
+              "precision" : { ".validate": "newData.isString() && newData.val().length <= 300" },
+              "$autre"    : { ".validate": false }
+            }
+          },
+
+          "$autre": { ".validate": false }
+        }
+      }
+    },
+
     "commandes": {
       ".read": "auth != null && root.child('roles').child(auth.uid).val() === 'chef'",
 

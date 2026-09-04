@@ -181,6 +181,65 @@ function pageDuRole(role){
 }
 
 /* ============================================================
+   L'HISTORIQUE DU CLIENT
+   /historiques/{uid}/{cle} = une commande passee
+   ------------------------------------------------------------
+   Pourquoi un noeud a part, au lieu de relire /commandes ?
+   Parce que les commandes sont effacees au bout de trois heures
+   pour garder l'ecran cuisine propre. L'historique, lui, doit
+   tenir la journee entiere, et suivre le compte d'un appareil a
+   l'autre. Il est donc range separement, sous l'uid.
+
+   Attention : une cle Firebase ne peut pas contenir . $ # [ ] /
+   Or une ligne de panier s'appelle "k12#Poulet". Les lignes sont
+   donc rangees dans une LISTE d'objets, jamais en cles.
+   ============================================================ */
+function lireHistoriqueEnLigne(){
+  const u = utilisateurActuel();
+  if (!u) return Promise.resolve([]);
+
+  return baseDeDonnees.ref("historiques/" + u.uid).once("value")
+    .then(function(instantane){
+      const liste = [];
+      instantane.forEach(function(enfant){
+        const c = enfant.val() || {};
+        c.cle = enfant.key;
+        liste.push(c);
+      });
+      /* la plus recente en premier */
+      liste.sort(function(a, b){ return (b.date || "").localeCompare(a.date || ""); });
+      return liste;
+    })
+    .catch(function(e){
+      console.warn("Historique illisible :", e.message);
+      return [];
+    });
+}
+
+function ecrireHistoriqueEnLigne(cle, commande){
+  const u = utilisateurActuel();
+  if (!u) return Promise.resolve(false);
+
+  return baseDeDonnees.ref("historiques/" + u.uid + "/" + cle).set(commande)
+    .then(function(){ return true; })
+    .catch(function(e){
+      console.warn("Historique non enregistre :", e.message);
+      return false;
+    });
+}
+
+function supprimerHistoriqueEnLigne(cles){
+  const u = utilisateurActuel();
+  if (!u || !cles.length) return Promise.resolve();
+
+  const effacements = {};
+  cles.forEach(function(cle){ effacements[cle] = null; });
+
+  return baseDeDonnees.ref("historiques/" + u.uid).update(effacements)
+    .catch(function(e){ console.warn("Menage de l'historique :", e.message); });
+}
+
+/* ============================================================
    LE PROFIL
    /profils/{uid} = { nom, telephone, adresse }
    Les regles n'autorisent chacun qu'a lire et ecrire le sien.

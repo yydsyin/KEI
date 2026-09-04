@@ -705,7 +705,10 @@ async function envoyerCommande(){
 
   /* on l'ajoute a "mes commandes du jour", avec son contenu :
      c'est ce qui permet de la refaire d'un seul geste. */
-  ajouterAHistorique({
+  /* on attend l'ecriture : l'ecran de confirmation relit
+     l'historique dans la foulee, et lirait sinon une liste sans
+     la commande qui vient de partir */
+  await ajouterAHistorique({
     numero     : numero,
     date       : new Date().toISOString(),
     total      : total,
@@ -799,11 +802,12 @@ function nouvelleCommande(){
    Le site garde la liste des commandes passees depuis cet
    appareil, et la remet a zero a chaque nouveau jour.
 
-   Elle vit dans le navigateur du client : le restaurant n'y a
-   pas acces, et elle survit a l'effacement des commandes dans
-   Firebase (qui a lieu au bout de quelques heures).
+   Elle vit sous le compte, dans Firebase (/historiques/{uid}),
+   et non dans le navigateur : elle suit donc le client d'un
+   appareil a l'autre. Chacun ne lit que la sienne, et elle
+   survit a l'effacement des commandes de la cuisine, qui a lieu
+   au bout de quelques heures.
    ============================================================ */
-const CLE_HISTORIQUE = "kei_historique";
 
 /* La date du jour, sous la forme "2026-09-01" */
 function jourActuel(date){
@@ -813,35 +817,109 @@ function jourActuel(date){
          String(d.getDate()).padStart(2, "0");
 }
 
-/* Lit l'historique en ne gardant que les commandes d'aujourd'hui.
-   C'est la lecture qui fait la remise a zero : inutile de guetter
-   minuit, il suffit de comparer les dates. */
-function lireHistorique(){
-  let liste;
-  try { liste = JSON.parse(localStorage.getItem(CLE_HISTORIQUE)) || []; }
-  catch (e) { liste = []; }
+/* ------------------------------------------------------------
+   Traduction entre le panier et la base.
 
-  const aujourdhui = jourActuel();
-  const dujour = liste.filter(function(c){ return jourActuel(c.date) === aujourdhui; });
-
-  /* si des commandes d'hier trainaient, on nettoie le stockage */
-  if (dujour.length !== liste.length) {
-    localStorage.setItem(CLE_HISTORIQUE, JSON.stringify(dujour));
+   Une cle Firebase ne peut pas contenir . $ # [ ] / . Or une
+   ligne de panier s'appelle "k12#Poulet". Les lignes voyagent
+   donc dans une LISTE d'objets, et redeviennent un panier a la
+   lecture : recommander() n'a ainsi rien a savoir de tout ca.
+   ------------------------------------------------------------ */
+function historiqueVersEnLigne(commande){
+  const lignes = [];
+  for (const id in (commande.plats || {})) {
+    const ligne = { ligne: id, quantite: commande.plats[id] };
+    if (commande.precisions && commande.precisions[id]) {
+      ligne.precision = commande.precisions[id];
+    }
+    lignes.push(ligne);
   }
-  return dujour;
+
+  const entree = {
+    numero : commande.numero,
+    date   : commande.date,
+    total  : commande.total || 0
+  };
+  if (commande.idEnLigne) entree.idEnLigne = commande.idEnLigne;
+  if (lignes.length)      entree.lignes    = lignes;
+
+  if (commande.horsMenu && commande.horsMenu.length) {
+    entree.horsMenu = commande.horsMenu.map(function(d){
+      const demande = { texte: d.texte, quantite: d.quantite };
+      if (d.precision) demande.precision = d.precision;
+      return demande;
+    });
+  }
+  return entree;
+}
+
+function historiqueDepuisEnLigne(entree){
+  const plats = {}, precisionsLues = {};
+
+  (entree.lignes || []).forEach(function(l){
+    plats[l.ligne] = l.quantite;
+    if (l.precision) precisionsLues[l.ligne] = l.precision;
+  });
+
+  return {
+    cle        : entree.cle,
+    numero     : entree.numero,
+    date       : entree.date,
+    total      : entree.total || 0,
+    idEnLigne  : entree.idEnLigne || "",
+    plats      : plats,
+    precisions : precisionsLues,
+    horsMenu   : (entree.horsMenu || []).map(function(d){
+      return { texte:d.texte, quantite:d.quantite, precision:d.precision || "" };
+    })
+  };
+}
+
+/* Lit l'historique du compte en ne gardant que les commandes
+   d'aujourd'hui. C'est la lecture qui fait la remise a zero :
+   inutile de guetter minuit, il suffit de comparer les dates.
+
+   Il est range sous le compte, dans Firebase, et non dans le
+   navigateur : c'est ce qui le fait suivre d'un appareil a
+   l'autre des qu'on se connecte. */
+function lireHistorique(){
+  /* Un navigateur peut garder en cache un vieux kei-firebase.js
+     sans ces fonctions, le temps qu'il se rafraichisse. Mieux vaut
+     un historique vide qu'une erreur en pleine page. */
+  if (typeof lireHistoriqueEnLigne !== "function") {
+    console.warn("Historique indisponible : rechargez la page.");
+    return Promise.resolve([]);
+  }
+
+  return lireHistoriqueEnLigne().then(function(brut){
+    const aujourdhui = jourActuel();
+    const dujour   = [];
+    const perimees = [];
+
+    brut.forEach(function(entree){
+      if (jourActuel(entree.date) === aujourdhui) dujour.push(historiqueDepuisEnLigne(entree));
+      else perimees.push(entree.cle);
+    });
+
+    /* les commandes d'hier ne servent plus a personne */
+    if (perimees.length) supprimerHistoriqueEnLigne(perimees);
+
+    return dujour.slice(0, 20);
+  });
 }
 
 function ajouterAHistorique(commande){
-  const liste = lireHistorique();
-  liste.unshift(commande);                    /* la plus recente en premier */
-  localStorage.setItem(CLE_HISTORIQUE, JSON.stringify(liste.slice(0, 20)));
+  const cle = commande.idEnLigne || commande.numero;
+  return ecrireHistoriqueEnLigne(cle, historiqueVersEnLigne(commande));
 }
 
 /* Affiche la liste, et suit en direct le statut de chaque commande */
-function afficherHistorique(){
+async function afficherHistorique(){
   const zone  = document.getElementById("historique");
   const liste = document.getElementById("liste-historique");
-  const commandes = lireHistorique();
+  if (!zone || !liste) return;
+
+  const commandes = await lireHistorique();
 
   zone.hidden = (commandes.length === 0);
   liste.innerHTML = "";
