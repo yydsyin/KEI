@@ -37,36 +37,11 @@ const NTFY = {
      son, vibration, affichage sur ecran verrouille. */
   priorite : 5,
 
-  /* ---------- LES RAPPELS ----------
-     ntfy ne sonne qu'une fois par message, et seule l'application
-     ntfy peut faire taire un message qui insiste. Pour que le
-     telephone insiste SANS qu'on ait a ouvrir ntfy, c'est donc le
-     site qui renvoie un nouveau message tant que la commande n'a
-     pas ete vue. Chaque message sonne une fois et se tait tout
-     seul ; c'est leur repetition qui reveille.
-
-     Le rappel s'arrete a la seconde ou la cuisine appuie sur
-     "Marquer comme vue" : le site suit le statut en direct.
-
-     Mettre 0 pour ne plus envoyer aucun rappel. */
-  secondesEntreRappels : 30,
-
-  /* Garde-fou, et il est indispensable.
-
-     ntfy.sh gratuit accepte 250 messages par jour et par adresse
-     IP. Au-dela il repond 429 et n'envoie plus RIEN : ni rappel,
-     ni meme la premiere alerte d'une nouvelle commande. Le chef
-     ne serait alors plus prevenu du tout, sans que personne s'en
-     apercoive.
-
-     20 rappels = 10 minutes de sonnerie, soit 21 messages au pire
-     pour une commande jamais vue. Il faudrait donc onze commandes
-     entierement ignorees dans la meme journee pour epuiser le
-     quota. Une commande vue en deux minutes n'en coute que cinq.
-
-     Passe dix minutes, de toute facon, le telephone n'est pas
-     pres de quelqu'un : insister davantage n'aiderait pas. */
-  rappelsMaximum : 20
+  /* Rappel automatique si le chef n'a rien vu.
+     ATTENTION : ce rappel part quoi qu'il arrive, meme si le chef
+     a deja vu la commande, car ntfy ne sait pas l'annuler.
+     Mettre 0 pour ne pas en envoyer. */
+  rappelMinutes : 0
 };
 
 /* ------------------------------------------------------------
@@ -74,7 +49,7 @@ const NTFY = {
    Ne bloque jamais la commande : si la notification echoue,
    la commande est deja enregistree dans Firebase.
    ------------------------------------------------------------ */
-function prevenirLeChef(commande, estUnRappel){
+function prevenirLeChef(commande){
   if (!NTFY.actif || !NTFY.sujet) return Promise.resolve(false);
 
   /* l'adresse de l'ecran cuisine, pour que le chef y arrive
@@ -87,7 +62,7 @@ function prevenirLeChef(commande, estUnRappel){
   const resume = [commande.numero, commande.mode].join("  -  ");
 
   const enTetes = {
-    "Title"    : estUnRappel ? "COMMANDE TOUJOURS EN ATTENTE" : "NOUVELLE COMMANDE",
+    "Title"    : "NOUVELLE COMMANDE",
     "Priority" : String(NTFY.priorite),
     "Tags"     : "bell"
   };
@@ -105,44 +80,20 @@ function prevenirLeChef(commande, estUnRappel){
     enTetes["Actions"] = "view, Ouvrir la cuisine, " + lienCuisine + ", clear=true";
   }
 
-  return envoyerNtfy(enTetes, resume);
-}
+  const envois = [ envoyerNtfy(enTetes, resume) ];
 
-/* ------------------------------------------------------------
-   LES RAPPELS JUSQU'A CE QUE LA COMMANDE SOIT VUE
-   ------------------------------------------------------------ */
-let minuterieRappels = null;
-let rappelsFaits     = 0;
-
-function demarrerRappels(commande){
-  arreterRappels();
-
-  if (!NTFY.actif || !NTFY.sujet) return;
-  if (!NTFY.secondesEntreRappels || NTFY.secondesEntreRappels <= 0) return;
-
-  rappelsFaits = 0;
-
-  minuterieRappels = setInterval(function(){
-
-    /* le garde-fou : au bout de rappelsMaximum, on renonce */
-    if (rappelsFaits >= NTFY.rappelsMaximum) { arreterRappels(); return; }
-    rappelsFaits++;
-
-    prevenirLeChef(commande, true).then(function(passe){
-      /* ntfy a refuse : service gratuit sature, plus de reseau...
-         Inutile d'insister contre un mur, et surtout inutile de
-         s'acharner sur un service qui nous dit non. */
-      if (!passe) arreterRappels();
+  /* le rappel differe, si le restaurant en veut un */
+  if (NTFY.rappelMinutes > 0) {
+    const enTetesRappel = Object.assign({}, enTetes, {
+      "Title" : "Commande toujours en attente ?",
+      "Delay" : NTFY.rappelMinutes + "min"
     });
-
-  }, NTFY.secondesEntreRappels * 1000);
-}
-
-function arreterRappels(){
-  if (minuterieRappels) {
-    clearInterval(minuterieRappels);
-    minuterieRappels = null;
+    envois.push(envoyerNtfy(enTetesRappel, resume));
   }
+
+  return Promise.all(envois).then(function(resultats){
+    return resultats[0];
+  });
 }
 
 /* Une requete vers ntfy. Renvoie true si elle est passee. */
