@@ -69,8 +69,9 @@ decimales     : 0,        // l'ariary ne s'écrit pas avec des centimes
 
 ### b) Régler les frais de livraison
 
-Toujours dans `js/config.js` : `fraisLivraison : 3000`.
-Mettre `0` s'il n'y a pas de livraison.
+Toujours dans `js/config.js` : `fraisLivraison`. KEI n'en facture pas,
+la valeur est donc `0` — aucune ligne de frais n'apparaît alors, ni dans
+le panier, ni sur la commande reçue en cuisine.
 
 ### c) Créer les comptes
 

@@ -30,8 +30,10 @@ const CONFIG = {
   devise    : "Ar",
   decimales : 0,
 
-  // Frais de livraison en ariary (mettre 0 s'il n'y en a pas)
-  fraisLivraison : 3000,
+  // Frais de livraison en ariary.
+  // A 0 : aucune ligne de frais n'apparait, ni dans le panier,
+  // ni sur la commande recue en cuisine. KEI n'en facture pas.
+  fraisLivraison : 0,
 
   // ---------------------------------------------------------
   // DUREE DE VIE D'UNE COMMANDE, en heures.
